@@ -1,9 +1,9 @@
 package main
 
 import (
+	"API-Core.go/libs/mongo"
 	"fmt"
 	"github.com/globalsign/mgo/bson"
-	"localhost/mongo"
 )
 
 func main() {
