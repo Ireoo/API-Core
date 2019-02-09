@@ -26,7 +26,9 @@ Username: "root"
 Password: "meiyoumima"
 Timeout: 200
 PoolLimit: 4096`), 0666)
-		log.Fatal(`api-core.conf is not exists.`)
+
+		log.Println(`api-core.conf is not exists.`)
+		log.Fatal("You can use \033[1mvim ./api-core.conf\033[0m to change MongoDB connect.")
 	}
 
 	config := new(conf.MongoDB)
