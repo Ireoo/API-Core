@@ -1,2 +1,17 @@
-# API-Core.go
-api core with golang
+# api.mongodb.golang 3.0.0
+
+## Golang 最新版本
+```bash
+sudo add-apt-repository ppa:longsleep/golang-backports
+sudo apt-get update
+sudo apt-get install golang-go
+```
+
+## dep 包管理安装
+```bash
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+```
+
+
+## 数据库操作
+https://www.jb51.net/article/143208.htm
