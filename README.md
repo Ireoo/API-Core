@@ -1,4 +1,5 @@
-# api.mongodb.golang 3.0.0
+# API Core with golang
+> version: 1.0.0
 
 ## Golang 最新版本
 ```bash
