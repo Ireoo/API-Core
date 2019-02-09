@@ -1,12 +1,14 @@
 package mongo
 
 import (
-	"API-Core.go/libs/basic"
-	"API-Core.go/libs/conf"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"time"
+
+	"API-Core/libs/basic"
+	"API-Core/libs/conf"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/globalsign/mgo"
 )
@@ -35,7 +37,6 @@ PoolLimit: 4096`), 0666)
 	configYaml, err := ioutil.ReadFile("./api-core.conf")
 
 	err = yaml.Unmarshal(configYaml, config)
-	// err = yaml.Unmarshal(yamlFile, &resultMap)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
