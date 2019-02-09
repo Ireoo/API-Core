@@ -1,38 +1,71 @@
 package mongo
 
 import (
+	"API-Core.go/libs/basic"
+	"API-Core.go/libs/conf"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"time"
 
 	"github.com/globalsign/mgo"
 )
 
-const (
-	dbhost    = "127.0.0.1:27017"
-	authdb    = "admin"
-	authuser  = "user"
-	authpass  = "123456"
-	timeout   = 200 * time.Millisecond
-	poollimit = 4096
-)
-
 var globalS *mgo.Session
 
 func init() {
-	dialInfo := &mgo.DialInfo{
-		Addrs:     []string{dbhost},
-		Timeout:   timeout,
-		Source:    authdb,
-		Username:  authuser,
-		Password:  authpass,
-		PoolLimit: poollimit,
+
+	exist, _ := basic.PathExists("./api-core.conf")
+	if !exist {
+		_ = ioutil.WriteFile("./api-core.conf", []byte(`# This is a api-core config file.
+# This is demo.
+
+Host: "127.0.0.1:27017"
+Auth: "admin"
+Username: "root"
+Password: "meiyoumima"
+Timeout: 200
+PoolLimit: 4096`), 0666)
+		log.Fatal(`api-core.conf is not exists.`)
 	}
 
-	s, err := mgo.DialWithInfo(dialInfo)
+	config := new(conf.MongoDB)
+	configYaml, err := ioutil.ReadFile("./api-core.conf")
+
+	err = yaml.Unmarshal(configYaml, config)
+	// err = yaml.Unmarshal(yamlFile, &resultMap)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+
+	if config.Host == "" && config.URI == "" {
+		log.Fatalln(config)
+	}
+
+	if config.URI == "" {
+		log.Printf(`Got config: HOST: %s`, config.Host)
+		log.Printf(`Got config: AUTH: %s`, config.Auth)
+		log.Printf(`Got config: USERNAME: %s`, config.Username)
+		log.Printf(`Got config: PASSWORD: %s`, config.Password)
+		log.Printf(`Got config: TIMEOUT: %s`, config.Timeout*time.Millisecond)
+		log.Printf(`Got config: POOLLIMIT: %d`, config.PoolLimit)
+		dialInfo := &mgo.DialInfo{
+			Addrs:     []string{config.Host},
+			Timeout:   config.Timeout * time.Millisecond,
+			Source:    config.Auth,
+			Username:  config.Username,
+			Password:  config.Password,
+			PoolLimit: config.PoolLimit,
+		}
+		globalS, err = mgo.DialWithInfo(dialInfo)
+	} else {
+		log.Printf(`Got config: URI: %s`, config.URI)
+		globalS, err = mgo.Dial(config.URI)
+	}
+
 	if err != nil {
 		log.Fatalf("Create Session: %s\n", err)
 	}
-	globalS = s
 }
 
 func connect(db, collection string) (*mgo.Session, *mgo.Collection) {
