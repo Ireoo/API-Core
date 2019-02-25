@@ -11,15 +11,20 @@ import (
 )
 
 type input struct {
-	Where interface{} `json:"where" form:"where" query:"where"`
-	Data  interface{} `json:"data" form:"data" query:"data"`
-	Other interface{} `json:"other" form:"other" query:"other"`
+	Where interface{} `json:"where"`
+	Data  interface{} `json:"data"`
+	Other interface{} `json:"other"`
+	Table string      `json:"table"`
+	Mode  string      `json:"mode"`
+	Auth  string      `json:"auth"`
 }
 
 const version = "1.0.0"
 
 var ver = flag.Bool("v", false, "版本信息")
-var port = flag.String("p", "", "端口地址")
+var port = flag.String("p", "2019", "端口地址")
+
+var auth = ""
 
 func main() {
 	flag.Parse()
@@ -60,12 +65,21 @@ func main() {
 		if err := c.Bind(Input); err != nil {
 			e.Logger.Print(err)
 		}
-		e.Logger.Print(Input)
+
+		Input.Table = c.Param("table")
+		Input.Mode = c.Param("mode")
+		Input.Auth = auth
+
 		return c.JSON(http.StatusOK, Input)
+	}, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			auth = c.Request().Header.Get(echo.HeaderAuthorization)
+			return next(c)
+		}
 	})
 
-	// 使用 2019 端口启动服务
-	e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":2019"}))
+	// 使用 port 设置的端口启动服务
+	e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + *port}))
 
 	// 设置ssl协议缓存地址
 	// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<DOMAIN>")

@@ -24,25 +24,6 @@
   revision = "eeefdecb41b842af6dc652aaea4026e8403e62df"
 
 [[projects]]
-  digest = "1:e1ff887e232b2d8f4f7c7db15a5fac7be418025afc4dda53c59c765dbb5aa6b4"
-  name = "github.com/go-playground/locales"
-  packages = [
-    ".",
-    "currency",
-  ]
-  pruneopts = "UT"
-  revision = "f63010822830b6fe52288ee52d5a1151088ce039"
-  version = "v0.12.1"
-
-[[projects]]
-  digest = "1:e022cf244bcac1b6ef933f1a2e0adcf6a6dfd7b872d8d41e4d4179bb09a87cbc"
-  name = "github.com/go-playground/universal-translator"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
-  version = "v0.16.0"
-
-[[projects]]
   digest = "1:efd601ad1d1189884f37ed075fadb5bbd17f1f5acf5862827247c6da56d125ba"
   name = "github.com/labstack/echo"
   packages = [
@@ -65,14 +46,6 @@
   pruneopts = "UT"
   revision = "7fd9f68ece0bcb1a905fac8f1549f0083f71c51b"
   version = "v0.2.8"
-
-[[projects]]
-  digest = "1:6782ffc812e8e700e6952ede1e60487ff1fd9da489eff762985be662a7cfc431"
-  name = "github.com/leodido/go-urn"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "70078a794e8ea4b497ba7c19a78cd60f90ccf0f4"
-  version = "v1.1.0"
 
 [[projects]]
   digest = "1:0f96ec4151a24d7bfd4298fc13cc320a000e31b4e5431cf88e3ffc961db846fd"
@@ -126,14 +99,6 @@
   revision = "3b5209105503162ded1863c307ac66fec31120dd"
 
 [[projects]]
-  digest = "1:718abca23a6d23b21b30197dd2c2bd2ee3ba88081b12caed1edb0d6bb5ef843a"
-  name = "gopkg.in/go-playground/validator.v9"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "774d09c3863ffb2e137ebe4c39ba27648d208f80"
-  version = "v9.26.0"
-
-[[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -148,8 +113,7 @@
     "github.com/globalsign/mgo",
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
-    "golang.org/x/crypto/acme/autocert",
-    "gopkg.in/go-playground/validator.v9",
+    "github.com/labstack/gommon/log",
     "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"
