@@ -1,8 +1,11 @@
 {
-  "name": "api_core",
-  "version": "1.0.0",
-  "scripts": {
-    "test": "go run main.go",
-    "build": "go build -o build/api"
-  }
+    "name": "api_core",
+    "version": "1.0.0",
+    "scripts": {
+        "test": "go run main.go",
+        "build": "go build -o build/api",
+        "dep": "npm run dep:install && npm run dep:init",
+        "dep:install": "curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh",
+        "dep:init": "dep ensure -v"
+    }
 }

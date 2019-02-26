@@ -27,7 +27,8 @@ Auth: "admin"
 Username: "root"
 Password: "meiyoumima"
 Timeout: 200
-PoolLimit: 4096`), 0666)
+PoolLimit: 4096
+#URI: "127.0.0.1:27017" # 如果不通过此URI直接连接，请删掉或者注释掉`), 0666)
 
 		log.Println(`api-core.conf is not exists.`)
 		log.Fatal("You can use \033[1mvim ./api-core.conf\033[0m to change MongoDB connect.")
