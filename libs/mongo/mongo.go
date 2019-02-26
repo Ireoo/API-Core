@@ -46,10 +46,10 @@ PoolLimit: 4096`), 0666)
 	}
 
 	if config.URI == "" {
-		log.Printf(`Got config: HOST: %s`, config.Host)
-		log.Printf(`Got config: AUTH: %s`, config.Auth)
-		log.Printf(`Got config: USERNAME: %s`, config.Username)
-		log.Printf(`Got config: PASSWORD: %s`, config.Password)
+		log.Printf(`Got config: HOST: %q`, config.Host)
+		log.Printf(`Got config: AUTH: %q`, config.Auth)
+		log.Printf(`Got config: USERNAME: %q`, config.Username)
+		log.Printf(`Got config: PASSWORD: %q`, config.Password)
 		log.Printf(`Got config: TIMEOUT: %s`, config.Timeout*time.Millisecond)
 		log.Printf(`Got config: POOLLIMIT: %d`, config.PoolLimit)
 		dialInfo := &mgo.DialInfo{
