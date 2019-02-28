@@ -2,10 +2,13 @@ package main
 
 import (
 	"API-Core/libs/mongo"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -16,21 +19,26 @@ import (
 type input struct {
 	Where bson.M `json:"where"`
 	Data  bson.M `json:"data"`
-	Other other  `json:"other"`
+	Other struct {
+		page  int
+		limit int
+	} `json:"other"`
 	Table string `json:"table"`
 	Mode  string `json:"mode"`
 	Auth  string `json:"auth"`
 }
 
-type other struct {
-	page  int
-	limit int
+type appInfo struct {
+	Id bson.ObjectId `bson:"_id"`
 }
 
 const version = "1.0.0"
 
 var ver = flag.Bool("v", false, "版本信息")
-var port = flag.String("p", "2019", "端口地址")
+var port = flag.String("p", "2019", "端口地址,默认: 2019")
+var ssl = flag.Bool("ssl", false, "是否开启SSL功能,默认不开启")
+
+//var _host = flag.String("host", "", "设置绑定域名,默认不绑定,需要绑定请设置绑定的域名,如: x.domain.com")
 
 var auth = ""
 
@@ -41,13 +49,6 @@ func main() {
 		fmt.Printf(`API-Core version: %s`, version)
 		return
 	}
-
-	// var result bson.M
-	// err := mongo.FindOne("api", "user", bson.M{"username": "18551410359"}, bson.M{"_id": 0}, &result)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println(result)
 
 	e := echo.New()
 	e.Logger.SetLevel(log.DEBUG)
@@ -70,8 +71,8 @@ func main() {
 	// 程序核心部分
 	e.POST("/:table/:mode", func(c echo.Context) (err error) {
 		Input := new(input)
-		if err := c.Bind(Input); err != nil {
-			e.Logger.Print(err)
+		if error := c.Bind(Input); err != nil {
+			e.Logger.Print(error)
 		} else {
 			e.Logger.Print(Input)
 		}
@@ -86,116 +87,104 @@ func main() {
 
 		app := "api"
 		if Input.Auth != "94f3eee0-218f-41fc-9318-94cf5430fc7f" {
-			app = "api"
+			//var result bson.M
+			AppInfo := new(appInfo)
+			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			}
+			app = hex.EncodeToString([]byte(AppInfo.Id))
+			//fmt.Println(app)
 		}
 
-		switch c.Param("mode") {
+		switch Input.Mode {
 		case "findOne":
 			var result bson.M
-			err := mongo.FindOne(app, Input.Table, Input.Where, bson.M{}, &result)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				e.Logger.Print(result)
-				return c.JSON(http.StatusOK, result)
+			error := mongo.FindOne(app, Input.Table, Input.Where, bson.M{}, &result)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			e.Logger.Print(result)
+			return c.JSON(http.StatusOK, result)
 
 		case "findAll":
 			var result []bson.M
-			err := mongo.FindAll(app, Input.Table, Input.Where, bson.M{}, &result)
-			if err != nil {
-				fmt.Println(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				e.Logger.Print(result)
-				return c.JSON(http.StatusOK, result)
+			error := mongo.FindAll(app, Input.Table, Input.Where, bson.M{}, &result)
+			if error != nil {
+				fmt.Println(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			e.Logger.Print(result)
+			return c.JSON(http.StatusOK, result)
 
 		case "findPage":
 			var result []bson.M
-			err := mongo.FindPage(app, Input.Table, Input.Other.page, Input.Other.limit, Input.Where, bson.M{}, &result)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				e.Logger.Print(result)
-				return c.JSON(http.StatusOK, result)
+			error := mongo.FindPage(app, Input.Table, Input.Other.page, Input.Other.limit, Input.Where, bson.M{}, &result)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			e.Logger.Print(result)
+			return c.JSON(http.StatusOK, result)
 
 		case "insert":
-			err := mongo.Insert(app, Input.Table, Input.Data)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return c.JSON(http.StatusOK, Input.Data)
+			error := mongo.Insert(app, Input.Table, Input.Data)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			return c.JSON(http.StatusOK, Input.Data)
 
 		case "update":
-			err = mongo.Update(app, Input.Table, Input.Data, Input.Where)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return c.JSON(http.StatusOK, Input.Data)
+			error := mongo.Update(app, Input.Table, Input.Data, Input.Where)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			return c.JSON(http.StatusOK, Input.Data)
 
 		case "updateAll":
-			err = mongo.UpdateAll(app, Input.Table, Input.Data, Input.Where)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return c.JSON(http.StatusOK, Input.Data)
+			error := mongo.UpdateAll(app, Input.Table, Input.Data, Input.Where)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			return c.JSON(http.StatusOK, Input.Data)
 
 		case "upsert":
-			err = mongo.Upsert(app, Input.Table, Input.Data, Input.Where)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return c.JSON(http.StatusOK, Input.Where)
+			error := mongo.Upsert(app, Input.Table, Input.Data, Input.Where)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			return c.JSON(http.StatusOK, Input.Where)
 
 		case "remove":
-			err = mongo.Remove(app, Input.Table, Input.Where)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return c.JSON(http.StatusOK, Input.Where)
+			error := mongo.Remove(app, Input.Table, Input.Where)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			return c.JSON(http.StatusOK, Input.Where)
 
 		case "removeAll":
-			err = mongo.RemoveAll(app, Input.Table, Input.Where)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				return c.JSON(http.StatusOK, Input.Where)
+			error := mongo.RemoveAll(app, Input.Table, Input.Where)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			return c.JSON(http.StatusOK, Input.Where)
 
 		case "count":
-			count, err := mongo.Count(app, Input.Table, Input.Where)
-			if err != nil {
-				e.Logger.Print(err)
-				return c.String(http.StatusNotFound, err.Error())
-			} else {
-				e.Logger.Print(count)
-				return c.String(http.StatusOK, strconv.Itoa(count))
+			count, error := mongo.Count(app, Input.Table, Input.Where)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
 			}
-			break
+			e.Logger.Print(count)
+			return c.String(http.StatusOK, strconv.Itoa(count))
 
 		case "isEmpty":
 			var r string
@@ -206,14 +195,12 @@ func main() {
 			}
 			e.Logger.Print(r)
 			return c.String(http.StatusOK, r)
-			break
 
 		default:
 			return c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
-			break
 		}
 
-		return c.String(http.StatusNoContent, "")
+		//return c.String(http.StatusNoContent, "")
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			auth = c.Request().Header.Get(echo.HeaderAuthorization)
@@ -221,17 +208,19 @@ func main() {
 		}
 	})
 
-	// 使用 port 设置的端口启动服务
-	e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + *port}))
+	if !*ssl {
+		// 使用 port 设置的端口启动服务
+		e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + *port}))
+	} else {
+		// 设置ssl协议缓存地址
+		// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<DOMAIN>")
+		// Cache certificates
+		e.AutoTLSManager.Cache = autocert.DirCache("~/.cache")
 
-	// 设置ssl协议缓存地址
-	// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<DOMAIN>")
-	// Cache certificates
-	// e.AutoTLSManager.Cache = autocert.DirCache("~/.cache")
+		// 重定向到https不带www
+		e.Pre(middleware.HTTPSRedirect())
 
-	// 重定向到https不带www
-	// e.Pre(middleware.HTTPSNonWWWRedirect())
-
-	// use ssl for 443
-	// e.Logger.Fatal(e.StartAutoTLS(":443"))
+		// use ssl for 443
+		e.Logger.Fatal(e.StartAutoTLS(":443"))
+	}
 }
