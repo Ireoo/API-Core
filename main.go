@@ -71,7 +71,7 @@ func main() {
 	// 程序核心部分
 	e.POST("/:table/:mode", func(c echo.Context) (err error) {
 		Input := new(input)
-		if error := c.Bind(Input); err != nil {
+		if error := c.Bind(Input); error != nil {
 			e.Logger.Print(error)
 		} else {
 			e.Logger.Print(Input)
@@ -200,7 +200,6 @@ func main() {
 			return c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
 		}
 
-		//return c.String(http.StatusNoContent, "")
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			auth = c.Request().Header.Get(echo.HeaderAuthorization)

@@ -125,6 +125,7 @@
     "github.com/labstack/echo",
     "github.com/labstack/echo/middleware",
     "github.com/labstack/gommon/log",
+    "golang.org/x/crypto/acme/autocert",
     "gopkg.in/mgo.v2/bson",
     "gopkg.in/yaml.v2",
   ]
