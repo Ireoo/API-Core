@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="441ee09e-875d-4380-b92c-582c5cd218da" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gopkg.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Gopkg.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1444">
-              <caret line="153" column="52" lean-forward="true" selection-start-line="153" selection-start-column="52" selection-end-line="153" selection-end-column="52" />
+            <state relative-caret-position="261">
+              <caret line="52" column="19" selection-start-line="52" selection-start-column="19" selection-end-line="52" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -26,8 +24,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/libs/mongo/mongo.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="677">
-              <caret line="148" column="64" lean-forward="true" selection-start-line="148" selection-start-column="64" selection-end-line="148" selection-end-column="64" />
+            <state>
+              <caret line="19" column="16" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
               <folding>
                 <element signature="e#15#150#0" expanded="true" />
               </folding>
@@ -36,20 +34,11 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/api-core.conf">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="171">
-              <caret line="9" column="20" selection-start-line="9" selection-start-column="20" selection-end-line="9" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="532">
-                <caret line="28" column="36" selection-start-line="28" selection-start-column="36" selection-end-line="28" selection-end-column="36" />
+              <first_editor>
+                <caret line="19" selection-start-line="19" selection-end-line="19" />
               </first_editor>
               <second_editor />
             </state>
@@ -59,7 +48,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
+            <state relative-caret-position="150">
               <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
             </state>
           </provider>
@@ -83,7 +72,7 @@
       <replace>input</replace>
     </replaceStrings>
   </component>
-  <component name="GOROOT" path="C:\Go" />
+  <component name="GOROOT" path="/usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -122,7 +111,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -135,10 +123,17 @@
               <item name="API-Core" type="462c0819:PsiDirectoryNode" />
               <item name="libs" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="API-Core" type="b2602c69:ProjectViewProjectNode" />
+              <item name="API-Core" type="462c0819:PsiDirectoryNode" />
+              <item name="libs" type="462c0819:PsiDirectoryNode" />
+              <item name="mongo" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -159,7 +154,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="watcher.settings" />
+    <property name="settings.editor.selected.configurable" value="preferences.editor" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -240,10 +235,9 @@
     </recent_temporary>
   </component>
   <component name="ToolWindowManager">
-    <frame x="201" y="66" width="1888" height="1241" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20076586" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25894135" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="npm" order="3" side_tool="true" />
@@ -319,13 +313,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/Go/src/builtin/builtin.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="603">
-          <caret line="255" column="7" selection-start-line="255" selection-start-column="7" selection-end-line="255" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://C:/Go/src/builtin/builtin.go" />
     <entry file="file://$PROJECT_DIR$/vendor/github.com/labstack/echo/context.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="418">
@@ -334,18 +322,12 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/libs/core/core.go" />
-    <entry file="file://$PROJECT_DIR$/api-core.conf">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="171">
-          <caret line="9" column="20" selection-start-line="9" selection-start-column="20" selection-end-line="9" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/api-core.conf" />
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="532">
-            <caret line="28" column="36" selection-start-line="28" selection-start-column="36" selection-end-line="28" selection-end-column="36" />
+          <first_editor>
+            <caret line="19" selection-start-line="19" selection-end-line="19" />
           </first_editor>
           <second_editor />
         </state>
@@ -353,15 +335,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
+        <state relative-caret-position="150">
           <caret line="10" column="1" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/libs/mongo/mongo.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="677">
-          <caret line="148" column="64" lean-forward="true" selection-start-line="148" selection-start-column="64" selection-end-line="148" selection-end-column="64" />
+        <state>
+          <caret line="19" column="16" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
           <folding>
             <element signature="e#15#150#0" expanded="true" />
           </folding>
@@ -370,8 +352,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1444">
-          <caret line="153" column="52" lean-forward="true" selection-start-line="153" selection-start-column="52" selection-end-line="153" selection-end-column="52" />
+        <state relative-caret-position="261">
+          <caret line="52" column="19" selection-start-line="52" selection-start-column="19" selection-end-line="52" selection-end-column="19" />
         </state>
       </provider>
     </entry>

@@ -138,7 +138,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Data)
 
 		case "update":
-			error := mongo.Update(app, Input.Table, Input.Data, Input.Where)
+			error := mongo.Update(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -146,7 +146,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Data)
 
 		case "updateAll":
-			error := mongo.UpdateAll(app, Input.Table, Input.Data, Input.Where)
+			error := mongo.UpdateAll(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -154,7 +154,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Data)
 
 		case "upsert":
-			error := mongo.Upsert(app, Input.Table, Input.Data, Input.Where)
+			error := mongo.Upsert(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
