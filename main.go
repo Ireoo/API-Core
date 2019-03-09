@@ -1,6 +1,7 @@
 package main
 
 import (
+	"API-Core/libs/conf"
 	"API-Core/libs/mongo"
 	"encoding/hex"
 	"flag"
@@ -15,22 +16,6 @@ import (
 	"github.com/labstack/gommon/log"
 	"gopkg.in/mgo.v2/bson"
 )
-
-type input struct {
-	Where bson.M `json:"where"`
-	Data  bson.M `json:"data"`
-	Other struct {
-		page  int
-		limit int
-	} `json:"other"`
-	Table string `json:"table"`
-	Mode  string `json:"mode"`
-	Auth  string `json:"auth"`
-}
-
-type appInfo struct {
-	Id bson.ObjectId `bson:"_id"`
-}
 
 const version = "1.0.0"
 
@@ -70,7 +55,7 @@ func main() {
 
 	// 程序核心部分
 	e.POST("/:table/:mode", func(c echo.Context) (err error) {
-		Input := new(input)
+		Input := new(conf.Input)
 		if error := c.Bind(Input); error != nil {
 			e.Logger.Print(error)
 		} else {
@@ -88,7 +73,7 @@ func main() {
 		app := "api"
 		if Input.Auth != "94f3eee0-218f-41fc-9318-94cf5430fc7f" {
 			//var result bson.M
-			AppInfo := new(appInfo)
+			AppInfo := new(conf.AppInfo)
 			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
 			if error != nil {
 				e.Logger.Print(error)
