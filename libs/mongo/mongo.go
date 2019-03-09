@@ -8,9 +8,8 @@ import (
 	"API-Core/libs/basic"
 	"API-Core/libs/conf"
 
+	"gopkg.in/mgo.v2"
 	"gopkg.in/yaml.v2"
-
-	"github.com/globalsign/mgo"
 )
 
 var globalS *mgo.Session
@@ -158,5 +157,61 @@ func RemoveAll(db, collection string, selector interface{}) error {
 	defer ms.Close()
 
 	_, err := c.RemoveAll(selector)
+	return err
+}
+
+func EnsureIndex(db, collection string, selector []string) error {
+	ms, c := connect(db, collection)
+	defer ms.Close()
+
+	index := mgo.Index{
+		Key:        selector,
+		Unique:     true,
+		DropDups:   true,
+		Background: true, // See notes.
+		Sparse:     true,
+	}
+	err := c.EnsureIndex(index)
+	return err
+}
+
+func Indexes(db, collection string) ([]mgo.Index, error) {
+	ms, c := connect(db, collection)
+	defer ms.Clone()
+
+	return c.Indexes()
+}
+
+/**
+ * 数据库操作
+ */
+
+func connectDB(db string) (*mgo.Session, *mgo.Database) {
+	ms := globalS.Copy()
+	d := ms.DB(db)
+	ms.SetMode(mgo.Monotonic, true)
+	return ms, d
+}
+
+func CollectionNames(db string) ([]string, error) {
+	ms, d := connectDB(db)
+	defer ms.Clone()
+
+	return d.CollectionNames()
+}
+
+func AddUser(db string, username string, password string, readOnly bool) error {
+	ms, d := connectDB(db)
+	defer ms.Clone()
+
+	err := d.AddUser(username, password, readOnly)
+	return err
+}
+
+func DropDatabase(db string) error {
+	ms, d := connectDB(db)
+	defer ms.Clone()
+
+	err := d.DropDatabase()
 	return err
 }

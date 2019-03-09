@@ -106,7 +106,7 @@ func main() {
 
 		case "findPage":
 			var result []bson.M
-			error := mongo.FindPage(app, Input.Table, Input.Other.page, Input.Other.limit, Input.Where, bson.M{}, &result)
+			error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, Input.Where, bson.M{}, &result)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -180,6 +180,56 @@ func main() {
 			}
 			e.Logger.Print(r)
 			return c.String(http.StatusOK, r)
+
+		default:
+			return c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
+		}
+
+	}, func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			auth = c.Request().Header.Get(echo.HeaderAuthorization)
+			return next(c)
+		}
+	})
+
+	e.POST("/:mode", func(c echo.Context) (err error) {
+		Input := new(conf.Input)
+		if error := c.Bind(Input); error != nil {
+			e.Logger.Print(error)
+		} else {
+			e.Logger.Print(Input)
+		}
+
+		Input.Table = c.Param("table")
+		Input.Mode = c.Param("mode")
+		Input.Auth = auth
+
+		if Input.Auth == "" {
+			return c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		}
+
+		app := "api"
+		if Input.Auth != "94f3eee0-218f-41fc-9318-94cf5430fc7f" {
+			//var result bson.M
+			AppInfo := new(conf.AppInfo)
+			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			}
+			app = hex.EncodeToString([]byte(AppInfo.Id))
+			//fmt.Println(app)
+		}
+
+		switch Input.Mode {
+		case "collectionNames":
+			names, error := mongo.CollectionNames(app)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
+			}
+			e.Logger.Print(names)
+			return c.JSON(http.StatusOK, names)
 
 		default:
 			return c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)

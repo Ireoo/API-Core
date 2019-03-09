@@ -19,8 +19,8 @@ type Input struct {
 	Where bson.M `json:"where"`
 	Data  bson.M `json:"data"`
 	Other struct {
-		page  int
-		limit int
+		Page  int
+		Limit int
 	} `json:"other"`
 	Table string `json:"table"`
 	Mode  string `json:"mode"`
