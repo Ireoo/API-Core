@@ -36,6 +36,11 @@ func main() {
 	}
 
 	e := echo.New()
+
+	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
+	e.Use(middleware.Gzip())
+
 	e.Logger.SetLevel(log.DEBUG)
 
 	// e.Logger.Print(os.Args)
@@ -46,8 +51,6 @@ func main() {
 	e.File("/", "static/index.html")
 	e.File("/admin", "static/admin.html")
 
-	e.Use(middleware.Recover())
-	e.Use(middleware.Logger())
 	// 	e.GET("/", func(c echo.Context) error {
 	// 		return c.HTML(http.StatusOK, `<h1 style="text-align: center;">欢迎使用 iData API 数据中心!</h1>
 	// <h3 style="text-align: center;">Welcome to the iData API Data Center!</h3>`)
@@ -83,6 +86,7 @@ func main() {
 			//fmt.Println(app)
 		}
 
+		fmt.Println(Input)
 		switch Input.Mode {
 		case "findOne":
 			var result bson.M
