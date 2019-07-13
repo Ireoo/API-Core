@@ -15,7 +15,6 @@ import (
 var globalS *mgo.Session
 
 func init() {
-
 	exist, _ := basic.PathExists("./api-core.conf")
 	if !exist {
 		_ = ioutil.WriteFile("./api-core.conf", []byte(`# This is a api-core config file.
