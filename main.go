@@ -20,8 +20,9 @@ import (
 const version = "1.0.0"
 
 var ver = flag.Bool("v", false, "版本信息")
-var port = flag.String("p", "2019", "端口地址,默认: 2019")
+var port = flag.String("p", "2019", "端口地址")
 var ssl = flag.Bool("ssl", false, "是否开启SSL功能,默认不开启")
+var secret = flag.String("secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
 
 //var _host = flag.String("host", "", "设置绑定域名,默认不绑定,需要绑定请设置绑定的域名,如: x.domain.com")
 
@@ -35,7 +36,13 @@ func main() {
 		return
 	}
 
+	fmt.Printf(`API-Core version: %s`, version)
+	fmt.Println("")
+	fmt.Println("")
+
 	e := echo.New()
+
+	e.HideBanner = true
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
@@ -74,7 +81,7 @@ func main() {
 		}
 
 		app := "api"
-		if Input.Auth != "94f3eee0-218f-41fc-9318-94cf5430fc7f" {
+		if Input.Auth != *secret {
 			//var result bson.M
 			AppInfo := new(conf.AppInfo)
 			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
