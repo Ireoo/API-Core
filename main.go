@@ -258,9 +258,9 @@ func main() {
 		e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + *port}))
 	} else {
 		// 设置ssl协议缓存地址
-		// e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("<DOMAIN>")
+		e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("localhost", "ireoo.com")
 		// Cache certificates
-		e.AutoTLSManager.Cache = autocert.DirCache("~/.cache")
+		e.AutoTLSManager.Cache = autocert.DirCache(".cache")
 
 		// 重定向到https不带www
 		e.Pre(middleware.HTTPSRedirect())
