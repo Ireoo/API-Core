@@ -2,3 +2,5 @@ vendor
 build
 api-core.conf
 .cache
+API-Core
+bindata.go
