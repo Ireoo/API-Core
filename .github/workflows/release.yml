@@ -28,6 +28,7 @@ jobs:
 
     - name: Get dependencies
       run: |
+        pwd
         go get -v -t -d ./...
         curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
         dep ensure -v
