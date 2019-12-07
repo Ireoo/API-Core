@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/ireoo/API-Core/libs/mongo"
+	"API-Core/libs/mongo"
 	"encoding/hex"
 	"fmt"
 	"github.com/labstack/echo"

@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ireoo/API-Core/libs/conf"
-	"github.com/ireoo/API-Core/libs/mongo"
+	"API-Core/libs/conf"
+	"API-Core/libs/mongo"
 
 	"golang.org/x/crypto/acme/autocert"
 
