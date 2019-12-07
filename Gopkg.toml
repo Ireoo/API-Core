@@ -40,3 +40,7 @@
 [[constraint]]
   name = "github.com/labstack/echo"
   version = "3.1.0"
+
+[[constraint]]
+  name = "github.com/ireoo/API-Core"
+  version = "1.0.0"

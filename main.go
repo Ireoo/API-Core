@@ -1,13 +1,14 @@
 package main
 
 import (
-	"libs/conf"
-	"libs/mongo"
 	"encoding/hex"
 	"flag"
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/ireoo/API-Core/libs/conf"
+	"github.com/ireoo/API-Core/libs/mongo"
 
 	"golang.org/x/crypto/acme/autocert"
 

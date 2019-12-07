@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"libs/basic"
-	"libs/conf"
+	"github.com/ireoo/API-Core/libs/basic"
+	"github.com/ireoo/API-Core/libs/conf"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/yaml.v2"
