@@ -1,9 +1,9 @@
 package core
 
 import (
-	"API-Core/libs/mongo"
 	"encoding/hex"
 	"fmt"
+	"github.com/Ireoo/API-Core/libs/mongo"
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
