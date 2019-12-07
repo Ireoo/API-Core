@@ -29,6 +29,7 @@ jobs:
     - name: Get dependencies
       run: |
         pwd
+        set $GOBIN="/Users/runner/go/bin"
         go env
         go get -v -t -d ./...
         curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
