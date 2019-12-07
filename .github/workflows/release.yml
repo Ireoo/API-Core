@@ -28,9 +28,6 @@ jobs:
 
     - name: Get dependencies
       run: |
-        pwd
-        set $GOBIN="/Users/runner/go/bin"
-        go env
         go get -v -t -d ./...
 #        if [ -f Gopkg.toml ]; then
 #          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
@@ -56,7 +53,7 @@ jobs:
 
     - name: upload linux
       uses: actions/upload-artifact@master
-      if: startsWith(matrix.os, 'linux')
+      if: startsWith(matrix.os, 'ubuntu')
       with:
         name: API-Core-${{matrix.os}}
         path: API-Core
