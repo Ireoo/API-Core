@@ -32,10 +32,10 @@ jobs:
         set $GOBIN="/Users/runner/go/bin"
         go env
         go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-          dep ensure -v
-        fi
+#        if [ -f Gopkg.toml ]; then
+#          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+#          dep ensure -v
+#        fi
 
     - name: Build
       run: go build -v .
