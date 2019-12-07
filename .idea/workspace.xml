@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="">
+    <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="更新配置文件">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/core/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/core/core.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/mongo/mongo.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/mongo/mongo.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,12 +22,6 @@
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
-  </component>
-  <component name="ProjectFrameBounds">
-    <option name="x" value="389" />
-    <option name="y" value="100" />
-    <option name="width" value="1888" />
-    <option name="height" value="1241" />
   </component>
   <component name="ProjectId" id="1Ueq1fthRyFgSWeXwOiOXrPg4Q2" />
   <component name="ProjectViewState">
@@ -52,7 +43,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Go Build.go build main.go">
     <configuration name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
@@ -116,6 +107,15 @@
       <screen x="0" y="23" width="1440" height="820" />
     </state>
     <state x="320" y="98" key="#GOROOT/0.23.1440.820@0.23.1440.820" timestamp="1575727209465" />
+    <state x="458" y="203" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1575729304227">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="458" y="203" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1575729304227" />
+    <state x="303" y="0" key="CommitChangelistDialog2" timestamp="1575729292694">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="303" y="0" key="CommitChangelistDialog2/0.0.1440.900@0.0.1440.900" timestamp="1575729292694" />
+    <state x="303" y="34" key="CommitChangelistDialog2/0.23.1440.820@0.23.1440.820" timestamp="1575728983513" />
     <state width="1358" height="198" key="GridCell.Tab.0.bottom" timestamp="1575728201235">
       <screen x="0" y="23" width="1440" height="820" />
     </state>
@@ -132,5 +132,14 @@
       <screen x="0" y="23" width="1440" height="820" />
     </state>
     <state width="1358" height="198" key="GridCell.Tab.0.right/0.23.1440.820@0.23.1440.820" timestamp="1575728201235" />
+    <state x="285" y="68" key="SettingsEditor" timestamp="1575729736780">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="285" y="68" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1575729736780" />
+    <state x="221" y="72" key="SettingsEditor/0.23.1440.820@0.23.1440.820" timestamp="1575729240814" />
+    <state x="320" y="173" key="Vcs.Push.Dialog.v2" timestamp="1575728986395">
+      <screen x="0" y="23" width="1440" height="820" />
+    </state>
+    <state x="320" y="173" key="Vcs.Push.Dialog.v2/0.23.1440.820@0.23.1440.820" timestamp="1575728986395" />
   </component>
 </project>
