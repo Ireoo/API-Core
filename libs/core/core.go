@@ -1,7 +1,7 @@
 package core
 
 import (
-	"API-Core/libs/mongo"
+	"libs/mongo"
 	"encoding/hex"
 	"fmt"
 	"github.com/labstack/echo"

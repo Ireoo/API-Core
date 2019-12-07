@@ -1,8 +1,8 @@
 package main
 
 import (
-	"API-Core/libs/conf"
-	"API-Core/libs/mongo"
+	"libs/conf"
+	"libs/mongo"
 	"encoding/hex"
 	"flag"
 	"fmt"
