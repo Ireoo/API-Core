@@ -100,3 +100,9 @@ jobs:
         git clone $git_cache cache
         cd cache
         echo "::set-output name=upload_url::$(cat $github_sha.txt)"
+
+    - name: get upload url
+      env:
+        upload_url: ${{steps.cache.outputs.upload_url}}
+      run:
+        echo $upload_url
