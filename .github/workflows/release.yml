@@ -45,6 +45,8 @@ jobs:
           git push
 
   build:
+    needs: release
+
     name: Build
     
     runs-on: ${{matrix.os}}
@@ -88,3 +90,13 @@ jobs:
       with:
         name: API-Core-${{matrix.os}}
         path: API-Core
+
+    - name: init cache
+      id: cache
+      env:
+        git_cache: ${{secrets.GIT_CACHE}}
+        github_sha: ${{github.sha}}
+      run: |
+        git clone $git_cache cache
+        cd cache
+        echo "::set-output name=upload_url::$(cat $github_sha.txt)"
