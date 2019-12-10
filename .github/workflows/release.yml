@@ -80,7 +80,7 @@ jobs:
         name: API-Core-${{matrix.os}}
         path: API-Core.exe
 
-    - name: upload mac os
+    - name: upload macos & linux
       uses: actions/upload-artifact@master
       if: !startsWith(matrix.os, 'windows')
       with:
