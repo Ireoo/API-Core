@@ -86,7 +86,7 @@ jobs:
 
     - name: upload macos & linux
       uses: actions/upload-artifact@master
-      if: startsWith(matrix.os, 'macos') && startsWith(matrix.os, 'ubuntu')
+      if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
       with:
         name: API-Core-${{matrix.os}}
         path: API-Core
@@ -121,7 +121,7 @@ jobs:
 
     - name: upload release
       uses: actions/upload-release-asset@v1.0.1
-      if: startsWith(matrix.os, 'macos') && startsWith(matrix.os, 'ubuntu')
+      if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       with:
