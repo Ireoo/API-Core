@@ -93,6 +93,7 @@ jobs:
 
     - name: init cache
       id: cache
+      shell: bash
       env:
         git_cache: ${{secrets.GIT_CACHE}}
         github_sha: ${{github.sha}}
