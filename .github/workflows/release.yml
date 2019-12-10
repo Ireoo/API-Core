@@ -13,6 +13,13 @@ jobs:
       - name: init
         uses: actions/checkout@v1
 
+      - name: get package
+        id: package
+        uses: Ireoo/get-package@v1
+        with:
+          path: package.json
+          key: version
+
       - name: create release
         id: release
         uses: actions/create-release@v1.0.0
