@@ -42,7 +42,7 @@ jobs:
           echo "$upload_url" > $github_sha.txt
           git add $github_sha.txt
           git commit -m "$github_sha"
-          git push -u origin master
+          git push
 
   build:
     name: Build
