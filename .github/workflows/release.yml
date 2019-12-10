@@ -3,6 +3,42 @@ name: Release
 on: [push]
 
 jobs:
+  release:
+    name: Release
+
+    runs-on: macos
+
+    steps:
+
+      - name: init
+        uses: actions/checkout@v1
+
+      - name: init cache
+        run: |
+          git clone ${{secrets.GIT_CACHE}} cache
+
+      - name: create release
+        id: release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: v${{steps.package.outputs.version}}
+          release_name: V${{steps.package.outputs.version}}
+          draft: false
+          prerelease: false
+
+      - name: init cache
+        env:
+          git_cache: ${{secrets.GIT_CACHE}}
+          upload_url: ${{steps.release.outputs.upload_url}}
+          github_sha: ${{github.sha}}
+        run: |
+          git clone $git_cache cache
+          echo "$upload_url" > $github_sha.txt
+          git add $github_sha.txt
+          git commit -m "$github_sha"
+          git push -u origin master
 
   build:
     name: Build
@@ -46,14 +82,7 @@ jobs:
 
     - name: upload mac os
       uses: actions/upload-artifact@master
-      if: startsWith(matrix.os, 'macOS')
-      with:
-        name: API-Core-${{matrix.os}}
-        path: API-Core
-
-    - name: upload linux
-      uses: actions/upload-artifact@master
-      if: startsWith(matrix.os, 'ubuntu')
+      if: !startsWith(matrix.os, 'windows')
       with:
         name: API-Core-${{matrix.os}}
         path: API-Core
