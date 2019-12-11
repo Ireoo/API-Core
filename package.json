@@ -1,6 +1,6 @@
 {
   "name": "api_core",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "scripts": {
     "test": "go run main.go",
     "build": "go build -o build/API-Core",

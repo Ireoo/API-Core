@@ -9,7 +9,6 @@ jobs:
     runs-on: macos
 
     steps:
-
       - name: init
         uses: actions/checkout@v1
 
@@ -48,84 +47,82 @@ jobs:
     needs: release
 
     name: Build
-    
-    runs-on: ${{matrix.os}}
-    
+
+    runs-on: ${{matrix.os}}-latest
+
     strategy:
       matrix:
-        os: [macOS-latest, windows-latest, ubuntu-latest]
+        os: [macOS, windows, ubuntu]
 
     steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
 
-    - name: Set up Go 1.13
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.13
-      id: go
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v1
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+      #        if [ -f Gopkg.toml ]; then
+      #          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      #          dep ensure -v
+      #        fi
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-#        if [ -f Gopkg.toml ]; then
-#          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-#          dep ensure -v
-#        fi
+      - name: Build
+        run: go build -v .
 
-    - name: Build
-      run: go build -v .
+      - name: upload windows
+        uses: actions/upload-artifact@master
+        if: startsWith(matrix.os, 'windows')
+        with:
+          name: API-Core-${{matrix.os}}
+          path: API-Core.exe
 
-    - name: upload windows
-      uses: actions/upload-artifact@master
-      if: startsWith(matrix.os, 'windows')
-      with:
-        name: API-Core-${{matrix.os}}
-        path: API-Core.exe
+      - name: upload macos & linux
+        uses: actions/upload-artifact@master
+        if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
+        with:
+          name: API-Core-${{matrix.os}}
+          path: API-Core
 
-    - name: upload macos & linux
-      uses: actions/upload-artifact@master
-      if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
-      with:
-        name: API-Core-${{matrix.os}}
-        path: API-Core
+      - name: init cache
+        id: cache
+        shell: bash
+        env:
+          git_cache: ${{secrets.GIT_CACHE}}
+          github_sha: ${{github.sha}}
+        run: |
+          git clone $git_cache cache
+          cd cache
+          echo "::set-output name=upload_url::$(cat $github_sha.txt)"
 
-    - name: init cache
-      id: cache
-      shell: bash
-      env:
-        git_cache: ${{secrets.GIT_CACHE}}
-        github_sha: ${{github.sha}}
-      run: |
-        git clone $git_cache cache
-        cd cache
-        echo "::set-output name=upload_url::$(cat $github_sha.txt)"
+      - name: get upload url
+        env:
+          upload_url: ${{steps.cache.outputs.upload_url}}
+        run: echo $upload_url
 
-    - name: get upload url
-      env:
-        upload_url: ${{steps.cache.outputs.upload_url}}
-      run:
-        echo $upload_url
+      - name: upload release
+        uses: actions/upload-release-asset@v1.0.1
+        if: startsWith(matrix.os, 'windows')
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.cache.outputs.upload_url}}
+          asset_path: API-Core.exe
+          asset_name: API-Core-${{matrix.os}}.exe
+          asset_content_type: application/x-executable
 
-    - name: upload release
-      uses: actions/upload-release-asset@v1.0.1
-      if: startsWith(matrix.os, 'windows')
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      with:
-        upload_url: ${{steps.cache.outputs.upload_url}}
-        asset_path: API-Core.exe
-        asset_name: API-Core-${{matrix.os}}.exe
-        asset_content_type: application/x-executable
-
-    - name: upload release
-      uses: actions/upload-release-asset@v1.0.1
-      if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
-      env:
-        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      with:
-        upload_url: ${{steps.cache.outputs.upload_url}}
-        asset_path: API-Core
-        asset_name: API-Core-${{matrix.os}}
-        asset_content_type: application/x-executable
+      - name: upload release
+        uses: actions/upload-release-asset@v1.0.1
+        if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.cache.outputs.upload_url}}
+          asset_path: API-Core
+          asset_name: API-Core-${{matrix.os}}
+          asset_content_type: application/x-executable
