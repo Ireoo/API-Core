@@ -9,6 +9,7 @@ import (
 
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongo"
+	Info "github.com/Dreamacro/clash/constant"
 
 	"golang.org/x/crypto/acme/autocert"
 
@@ -17,8 +18,6 @@ import (
 	"github.com/labstack/gommon/log"
 	"gopkg.in/mgo.v2/bson"
 )
-
-const version = "1.0.0"
 
 var ver = flag.Bool("v", false, "版本信息")
 var port = flag.String("p", "2019", "端口地址")
@@ -33,7 +32,8 @@ func main() {
 	flag.Parse()
 
 	if *ver {
-		fmt.Printf(`API-Core version: %s`, version)
+		//fmt.Printf(`API-Core version: %s`, version)
+		fmt.Printf("API-Core version: %s, build time: %s\n", Info.Version, Info.BuildTime)
 		return
 	}
 
