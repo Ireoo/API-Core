@@ -1,5 +1,6 @@
 FROM golang:alpine as builder
 
+RUN apk add --no-cache make git
 WORKDIR /api-core-src
 COPY --from=tonistiigi/xx:golang / /
 COPY . /api-core-src
