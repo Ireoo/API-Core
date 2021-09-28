@@ -34,6 +34,9 @@ PoolLimit: 4096
 
 	config := new(conf.MongoDB)
 	configYaml, err := ioutil.ReadFile("./api-core.conf")
+	if err != nil {
+		log.Fatalf("ReadFile: %v", err)
+	}
 
 	err = yaml.Unmarshal(configYaml, config)
 	if err != nil {
