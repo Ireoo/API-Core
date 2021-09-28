@@ -3,14 +3,19 @@ package core
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongo"
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 func Core(c echo.Context) (err error) {
-	Input := new(input)
+	e := echo.New()
+
+	Input := new(conf.Input)
 	if error := c.Bind(Input); error != nil {
 		e.Logger.Print(error)
 	} else {
@@ -19,7 +24,7 @@ func Core(c echo.Context) (err error) {
 
 	Input.Table = c.Param("table")
 	Input.Mode = c.Param("mode")
-	Input.Auth = auth
+	Input.Auth = c.Param("auth")
 
 	if Input.Auth == "" {
 		return c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
@@ -28,7 +33,7 @@ func Core(c echo.Context) (err error) {
 	app := "api"
 	if Input.Auth != "94f3eee0-218f-41fc-9318-94cf5430fc7f" {
 		//var result bson.M
-		AppInfo := new(appInfo)
+		AppInfo := new(conf.AppInfo)
 		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
 		if error != nil {
 			e.Logger.Print(error)
@@ -61,7 +66,7 @@ func Core(c echo.Context) (err error) {
 
 	case "findPage":
 		var result []bson.M
-		error := mongo.FindPage(app, Input.Table, Input.Other.page, Input.Other.limit, Input.Where, bson.M{}, &result)
+		error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, Input.Where, bson.M{}, &result)
 		if error != nil {
 			e.Logger.Print(error)
 			return c.String(http.StatusNotFound, error.Error())
