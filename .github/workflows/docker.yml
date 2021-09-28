@@ -48,7 +48,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          tags: 'dreamacro/clash:dev,ghcr.io/dreamacro/clash:dev'
+          tags: 'ireoo/API-Core:dev,ghcr.io/ireoo/API-Core:dev'
 
       - name: Get all docker tags
         if: startsWith(github.ref, 'refs/tags/')
@@ -58,10 +58,10 @@ jobs:
           script: |
             const ref = `${context.payload.ref.replace(/\/?refs\/tags\//, '')}`
             const tags = [
-              'dreamacro/clash:latest',
-              `dreamacro/clash:${ref}`,
-              'ghcr.io/dreamacro/clash:latest',
-              `ghcr.io/dreamacro/clash:${ref}`
+              'ireoo/API-Core:latest',
+              `ireoo/API-Core:${ref}`,
+              'ghcr.io/ireoo/API-Core:latest',
+              `ghcr.io/ireoo/API-Core:${ref}`
             ]
             return tags.join(',')
           result-encoding: string
