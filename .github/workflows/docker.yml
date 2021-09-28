@@ -48,7 +48,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           push: true
-          tags: 'ireoo/API-Core:dev,ghcr.io/ireoo/API-Core:dev'
+          tags: 'ireoo/api.core:dev,ghcr.io/ireoo/api.core:dev'
 
       - name: Get all docker tags
         if: startsWith(github.ref, 'refs/tags/')
@@ -58,10 +58,10 @@ jobs:
           script: |
             const ref = `${context.payload.ref.replace(/\/?refs\/tags\//, '')}`
             const tags = [
-              'ireoo/API-Core:latest',
-              `ireoo/API-Core:${ref}`,
-              'ghcr.io/ireoo/API-Core:latest',
-              `ghcr.io/ireoo/API-Core:${ref}`
+              'ireoo/api.core:latest',
+              `ireoo/api.core:${ref}`,
+              'ghcr.io/ireoo/api.core:latest',
+              `ghcr.io/ireoo/api.core:${ref}`
             ]
             return tags.join(',')
           result-encoding: string
