@@ -5,3 +5,4 @@ api-core.conf
 API-Core
 bindata.go
 node_modules
+main
