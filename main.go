@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf(`API-Core version: %s`, version)
+	fmt.Printf("API-Core version: %s, build time: %s\n", Info.Version, Info.BuildTime)
 	fmt.Println("")
 	fmt.Println("")
 
