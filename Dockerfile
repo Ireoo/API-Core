@@ -5,11 +5,11 @@ COPY --from=tonistiigi/xx:golang / /
 COPY . /api-core-src
 RUN go mod download && \
     make docker && \
-    mv ./bin/api-core-docker /api-core
+    mv ./bin/API-Core-docker /API-Core
 
 FROM alpine:latest
 LABEL org.opencontainers.image.source="https://github.com/Ireoo/API-Core"
 
 RUN apk add --no-cache ca-certificates
-COPY --from=builder /api-core /
-ENTRYPOINT ["/api-core"]
+COPY --from=builder /API-Core /
+ENTRYPOINT ["/API-Core"]
