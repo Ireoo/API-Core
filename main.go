@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
+	Info "github.com/Ireoo/API-Core/info"
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongo"
-	Info "github.com/Dreamacro/clash/constant"
 
 	"golang.org/x/crypto/acme/autocert"
 
@@ -19,25 +19,40 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var ver = flag.Bool("v", false, "版本信息")
-var port = flag.String("p", "2019", "端口地址")
-var ssl = flag.Bool("ssl", false, "是否开启SSL功能,默认不开启")
-var secret = flag.String("secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
+// var ver = flag.Bool("v", false, "版本信息")
+// var port = flag.String("p", "2019", "端口地址")
+// var ssl = flag.Bool("ssl", false, "是否开启SSL功能,默认不开启")
+// var secret = flag.String("secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
+
+var (
+	ver    bool
+	ssl    bool
+	port   string
+	secret string
+)
+
+func init() {
+	flag.StringVar(&port, "p", "2019", "端口地址")
+	flag.StringVar(&secret, "secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
+	flag.BoolVar(&ver, "v", false, "版本信息")
+	flag.BoolVar(&ssl, "ssl", false, "是否开启SSL功能,默认不开启")
+	flag.Parse()
+}
 
 //var _host = flag.String("host", "", "设置绑定域名,默认不绑定,需要绑定请设置绑定的域名,如: x.domain.com")
 
 var auth = ""
 
 func main() {
-	flag.Parse()
+	// flag.Parse()
 
-	if *ver {
+	if ver {
 		//fmt.Printf(`API-Core version: %s`, version)
-		fmt.Printf("API-Core version: %s, build time: %s\n", Info.Version, Info.BuildTime)
+		fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
 		return
 	}
 
-	fmt.Printf("API-Core version: %s, build time: %s\n", Info.Version, Info.BuildTime)
+	fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
 	fmt.Println("")
 	fmt.Println("")
 
@@ -82,7 +97,7 @@ func main() {
 		}
 
 		app := "api"
-		if Input.Auth != *secret {
+		if Input.Auth != secret {
 			//var result bson.M
 			AppInfo := new(conf.AppInfo)
 			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
@@ -254,9 +269,9 @@ func main() {
 		}
 	})
 
-	if !*ssl {
+	if !ssl {
 		// 使用 port 设置的端口启动服务
-		e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + *port}))
+		e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + port}))
 	} else {
 		// 设置ssl协议缓存地址
 		e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("localhost", "ireoo.com")

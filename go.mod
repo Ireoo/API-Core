@@ -1,10 +1,8 @@
-module github/Ireoo/API-Core
+module github.com/Ireoo/API-Core
 
 go 1.17
 
 require (
-	github.com/Dreamacro/clash v1.7.1
-	github.com/Ireoo/API-Core v1.0.9
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
