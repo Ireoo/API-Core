@@ -11,7 +11,7 @@ import (
 	"github.com/Ireoo/API-Core/libs/basic"
 	"github.com/Ireoo/API-Core/libs/conf"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
