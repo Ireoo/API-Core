@@ -127,19 +127,19 @@ func FindOne(db, collection string, query, selector, result interface{}) error {
 	return c.FindOne(context.TODO(), query).Decode(result)
 }
 
-func FindAll(db, collection string, query, selector, result interface{}) error {
+func FindAll(db, collection string, query, selector interface{}) (*mongo.Cursor, error) {
 	c := connect(db, collection)
 
 	result, err := c.Find(context.TODO(), query)
-	return err
+	return result, err
 }
 
-func FindPage(db, collection string, page, limit int, query, selector, result interface{}) error {
+func FindPage(db, collection string, page, limit int, query, selector interface{}) (*mongo.Cursor, error) {
 	c := connect(db, collection)
 
 	// return c.Find(query).Select(selector).Skip(page * limit).Limit(limit).All(result)
 	result, err := c.Find(context.TODO(), query)
-	return err
+	return result, err
 }
 
 func Update(db, collection string, selector, update interface{}) error {

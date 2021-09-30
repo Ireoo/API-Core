@@ -122,8 +122,7 @@ func main() {
 			return c.JSON(http.StatusOK, result)
 
 		case "findAll":
-			var result []bson.M
-			error := mongo.FindAll(app, Input.Table, Input.Where, bson.M{}, &result)
+			result, error := mongo.FindAll(app, Input.Table, Input.Where, bson.M{})
 			if error != nil {
 				fmt.Println(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -132,8 +131,7 @@ func main() {
 			return c.JSON(http.StatusOK, result)
 
 		case "findPage":
-			var result []bson.M
-			error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, Input.Where, bson.M{}, &result)
+			result, error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, Input.Where, bson.M{})
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
