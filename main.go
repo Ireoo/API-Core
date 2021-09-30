@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+
 	"flag"
 	"fmt"
 	"net/http"
@@ -87,7 +88,9 @@ func main() {
 		if error := c.Bind(Input); error != nil {
 			e.Logger.Print(error)
 		} else {
+			fmt.Println("")
 			e.Logger.Print(Input)
+			// return c.JSON(http.StatusOK, Input)
 		}
 
 		Input.Table = c.Param("table")
@@ -111,11 +114,23 @@ func main() {
 			//fmt.Println(app)
 		}
 
-		fmt.Println(Input)
+		fmt.Println("")
+		var where bson.M
+		err = bson.UnmarshalJSON([]byte(Input.Where), &where)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		var data bson.M
+		err = bson.UnmarshalJSON([]byte(Input.Data), &data)
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		switch Input.Mode {
 		case "findOne":
 			var result bson.M
-			error := mongo.FindOne(app, Input.Table, Input.Where, bson.M{}, &result)
+			error := mongo.FindOne(app, Input.Table, where, bson.M{}, &result)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -124,7 +139,7 @@ func main() {
 			return c.JSON(http.StatusOK, result)
 
 		case "findAll":
-			result, error := mongo.FindAll(app, Input.Table, Input.Where, bson.M{})
+			result, error := mongo.FindAll(app, Input.Table, where, bson.M{})
 			if error != nil {
 				fmt.Println(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -133,7 +148,7 @@ func main() {
 			return c.JSON(http.StatusOK, result)
 
 		case "findPage":
-			result, error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, Input.Where, bson.M{})
+			result, error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, where, bson.M{})
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -142,7 +157,7 @@ func main() {
 			return c.JSON(http.StatusOK, result)
 
 		case "insert":
-			insert, error := mongo.Insert(app, Input.Table, Input.Data)
+			insert, error := mongo.Insert(app, Input.Table, data)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -150,7 +165,7 @@ func main() {
 			return c.JSON(http.StatusOK, insert)
 
 		case "update":
-			error := mongo.Update(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
+			error := mongo.Update(app, Input.Table, bson.M{"$set": data}, where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -158,7 +173,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Data)
 
 		case "updateAll":
-			error := mongo.UpdateAll(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
+			error := mongo.UpdateAll(app, Input.Table, bson.M{"$set": data}, where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -166,7 +181,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Data)
 
 		case "upsert":
-			error := mongo.Upsert(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
+			error := mongo.Upsert(app, Input.Table, bson.M{"$set": data}, where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -174,7 +189,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Where)
 
 		case "remove":
-			error := mongo.Remove(app, Input.Table, Input.Where)
+			error := mongo.Remove(app, Input.Table, where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -182,7 +197,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Where)
 
 		case "removeAll":
-			error := mongo.RemoveAll(app, Input.Table, Input.Where)
+			error := mongo.RemoveAll(app, Input.Table, where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
@@ -190,7 +205,7 @@ func main() {
 			return c.JSON(http.StatusOK, Input.Where)
 
 		case "count":
-			count, error := mongo.Count(app, Input.Table, Input.Where)
+			count, error := mongo.Count(app, Input.Table, where)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())

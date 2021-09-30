@@ -128,25 +128,35 @@ func FindOne(db, collection string, query, selector, result interface{}) error {
 	return c.FindOne(context.TODO(), query).Decode(result)
 }
 
-func FindAll(db, collection string, query, selector interface{}) (*mongo.Cursor, error) {
+func FindAll(db, collection string, query, selector interface{}) ([]bson.M, error) {
 	c := connect(db, collection)
 
-	result, err := c.Find(context.TODO(), query)
+	Cursor, err := c.Find(context.TODO(), query)
+	if err != nil {
+		return []bson.M{}, err
+	}
+	var result []bson.M
+	err = Cursor.All(context.TODO(), &result)
 	return result, err
 }
 
-func FindPage(db, collection string, page, limit int, query, selector interface{}) (*mongo.Cursor, error) {
+func FindPage(db, collection string, page, limit int, query, selector interface{}) ([]bson.M, error) {
 	c := connect(db, collection)
 
 	// return c.Find(query).Select(selector).Skip(page * limit).Limit(limit).All(result)
-	result, err := c.Find(context.TODO(), query)
+	Cursor, err := c.Find(context.TODO(), query)
+	if err != nil {
+		return []bson.M{}, err
+	}
+	var result []bson.M
+	err = Cursor.All(context.TODO(), &result)
 	return result, err
 }
 
 func Update(db, collection string, selector, update interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.UpdateOne(context.TODO(), selector, update)
+	_, err := c.UpdateOne(context.TODO(), update, selector)
 	return err
 }
 
@@ -154,14 +164,14 @@ func Upsert(db, collection string, selector, update interface{}) error {
 	c := connect(db, collection)
 
 	opts := options.Update().SetUpsert(true)
-	_, err := c.UpdateOne(context.TODO(), selector, update, opts)
+	_, err := c.UpdateOne(context.TODO(), update, selector, opts)
 	return err
 }
 
 func UpdateAll(db, collection string, selector, update interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.UpdateMany(context.TODO(), selector, update)
+	_, err := c.UpdateMany(context.TODO(), update, selector)
 	return err
 }
 

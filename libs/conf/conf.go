@@ -17,15 +17,15 @@ type MongoDB struct {
 }
 
 type Input struct {
-	Where bson.M `json:"where"`
-	Data  bson.M `json:"data"`
+	Where string `json:"where" form:"where" query:"where"`
+	Data  string `json:"data" form:"data" query:"data"`
 	Other struct {
 		Page  int
 		Limit int
-	} `json:"other"`
-	Table string `json:"table"`
-	Mode  string `json:"mode"`
-	Auth  string `json:"auth"`
+	} `json:"other" form:"other" query:"other"`
+	Table string `json:"table" form:"table" query:"table"`
+	Mode  string `json:"mode" form:"mode" query:"mode"`
+	Auth  string `json:"auth" form:"auth" query:"auth"`
 }
 
 type AppInfo struct {
