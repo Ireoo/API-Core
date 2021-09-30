@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -37,8 +38,9 @@ Timeout: 200
 PoolLimit: 4096
 #URI: "127.0.0.1:27017" # 如果不通过此URI直接连接，请删掉或者注释掉`), 0666)
 
-		log.Println(`api-core.conf is not exists.`)
-		log.Fatal("You can use \033[1mvim ./api-core.conf\033[0m to change MongoDB connect.")
+		fmt.Println(`api-core.conf is not exists.`)
+		fmt.Println("You can use \033[1mvim ./api-core.conf\033[0m to change MongoDB connect.")
+		os.Exit(0)
 	}
 
 	config := new(conf.MongoDB)
