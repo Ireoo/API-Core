@@ -1,4 +1,4 @@
-FROM node:alpine as admin
+FROM node:16-alpine as admin
 
 RUN apk add --no-cache make git
 RUN git clone https://github.com/Ireoo/API.admin.git /app
