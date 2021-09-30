@@ -54,8 +54,8 @@ PoolLimit: 4096
 		log.Fatalf("Unmarshal: %v", err)
 	}
 
-	if err := godotenv.Load(); err != nil {
-		log.Print(err)
+	uri = os.Getenv("MONGODB_URI")
+	if uri == "" {
 		if config.Host == "" && config.URI == "" {
 			log.Fatalln(config)
 		}
@@ -73,7 +73,6 @@ PoolLimit: 4096
 			uri = config.URI
 		}
 	} else {
-		uri = os.Getenv("MONGODB_URI")
 		log.Printf(`Got env config: URI: %s`, uri)
 	}
 
