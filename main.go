@@ -7,10 +7,9 @@ import (
 	"net/http"
 	"strconv"
 
-	Info "github.com/Ireoo/API-Core/info"
+	_ "github.com/Ireoo/API-Core/a"
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongodb"
-	"github.com/Ireoo/API-Core/libs/version"
 
 	"golang.org/x/crypto/acme/autocert"
 
@@ -49,7 +48,7 @@ func main() {
 
 	// if ver {
 	// 	//fmt.Printf(`API-Core version: %s`, version)
-	// 	fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
+	// 	// fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
 	// 	return
 	// }
 
@@ -272,7 +271,10 @@ func main() {
 
 	if !ssl {
 		// 使用 port 设置的端口启动服务
+		fmt.Println("")
 		e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + port}))
+		fmt.Println("")
+		fmt.Println("")
 	} else {
 		// 设置ssl协议缓存地址
 		e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("localhost", "ireoo.com")
@@ -283,6 +285,9 @@ func main() {
 		e.Pre(middleware.HTTPSRedirect())
 
 		// use ssl for 443
+		fmt.Println("")
 		e.Logger.Fatal(e.StartAutoTLS(":443"))
+		fmt.Println("")
+		fmt.Println("")
 	}
 }

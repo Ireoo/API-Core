@@ -11,7 +11,6 @@ require (
 )
 
 require (
-	github.com/amorist/mango v0.1.7
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/joho/godotenv v1.3.0
 	github.com/mattn/go-colorable v0.1.4 // indirect

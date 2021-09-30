@@ -1,8 +1,9 @@
-package version
+package a
 
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	Info "github.com/Ireoo/API-Core/info"
 )
@@ -16,8 +17,10 @@ func init() {
 	flag.Parse()
 
 	if ver {
-		//fmt.Printf(`API-Core version: %s`, version)
+
+		// fmt.Printf(`API-Core version: %s`, version)
 		fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
+		os.Exit(0)
 		return
 	}
 

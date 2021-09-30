@@ -14,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"gopkg.in/yaml.v2"
 )
 
@@ -74,15 +75,22 @@ PoolLimit: 4096
 		log.Printf(`Got config: URI: %s`, uri)
 	}
 
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
-		panic(err)
+		log.Fatalf("Create Session: %s\n", err)
 	}
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			log.Fatalf("Create Session: %s\n", err)
-		}
-	}()
+
+	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout*time.Millisecond)
+	defer cancel()
+	err = client.Ping(ctx, readpref.Primary())
+	if err != nil {
+		log.Fatalf("Create Session: %s\n", err)
+	}
+	// defer func() {
+	// 	if err := client.Disconnect(context.TODO()); err != nil {
+	// 		log.Fatalf("Create Session: %s\n", err)
+	// 	}
+	// }()
 }
 
 func connect(db, collection string) *mongo.Collection {
