@@ -128,6 +128,16 @@ func main() {
 		}
 
 		switch Input.Mode {
+		case "once":
+			var result bson.M
+			error := mongo.FindOne(app, Input.Table, where, bson.M{}, &result)
+			if error != nil {
+				e.Logger.Print(error)
+				return c.String(http.StatusNotFound, error.Error())
+			}
+			e.Logger.Print(result)
+			return c.JSON(http.StatusOK, result)
+
 		case "findOne":
 			var result bson.M
 			error := mongo.FindOne(app, Input.Table, where, bson.M{}, &result)
