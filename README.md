@@ -10,11 +10,9 @@ sudo apt-get update
 sudo apt-get install golang-go
 ```
 
-## dep 包管理安装
+## Releases
 
-```bash
-curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-```
+https://github.com/Ireoo/API-Core/releases
 
 ## 数据库操作
 
@@ -27,6 +25,7 @@ curl \
   -X POST \
   http://localhost:2019/users/insert \
   -H 'Content-Type: application/json' \
+  -H 'Authorization: xxxxxxxxxx' \
   -d '{"where":{"id":1},"data":"2", "other":"3"}'
 ```
 

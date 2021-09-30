@@ -12,10 +12,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	globalS *mgo.Session
-	// isInit  bool
-)
+var globalS *mgo.Session
 
 func init() {
 	exist, _ := basic.PathExists("./api-core.conf")
@@ -64,7 +61,6 @@ PoolLimit: 4096
 			Username:  config.Username,
 			Password:  config.Password,
 			PoolLimit: config.PoolLimit,
-			Mechanism: "LDAP",
 		}
 		globalS, err = mgo.DialWithInfo(dialInfo)
 	} else {
@@ -75,13 +71,9 @@ PoolLimit: 4096
 	if err != nil {
 		log.Fatalf("Create Session: %s\n", err)
 	}
-	// isInit = true
 }
 
 func connect(db, collection string) (*mgo.Session, *mgo.Collection) {
-	// if !isInit {
-	// 	_init()
-	// }
 	ms := globalS.Copy()
 	c := ms.DB(db).C(collection)
 	ms.SetMode(mgo.Monotonic, true)

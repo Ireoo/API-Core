@@ -9,7 +9,8 @@ import (
 
 	Info "github.com/Ireoo/API-Core/info"
 	"github.com/Ireoo/API-Core/libs/conf"
-	"github.com/Ireoo/API-Core/libs/mongo"
+	"github.com/Ireoo/API-Core/libs/mongodb"
+	"github.com/Ireoo/API-Core/libs/version"
 
 	"golang.org/x/crypto/acme/autocert"
 
@@ -25,7 +26,7 @@ import (
 // var secret = flag.String("secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
 
 var (
-	ver    bool
+	// ver    bool
 	ssl    bool
 	port   string
 	secret string
@@ -34,7 +35,7 @@ var (
 func init() {
 	flag.StringVar(&port, "p", "2019", "端口地址")
 	flag.StringVar(&secret, "secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
-	flag.BoolVar(&ver, "v", false, "版本信息")
+	// flag.BoolVar(&ver, "v", false, "版本信息")
 	flag.BoolVar(&ssl, "ssl", false, "是否开启SSL功能,默认不开启")
 	flag.Parse()
 }
@@ -46,15 +47,15 @@ var auth = ""
 func main() {
 	// flag.Parse()
 
-	if ver {
-		//fmt.Printf(`API-Core version: %s`, version)
-		fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
-		return
-	}
+	// if ver {
+	// 	//fmt.Printf(`API-Core version: %s`, version)
+	// 	fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
+	// 	return
+	// }
 
-	fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
-	fmt.Println("")
-	fmt.Println("")
+	// fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
+	// fmt.Println("")
+	// fmt.Println("")
 
 	e := echo.New()
 
@@ -142,12 +143,12 @@ func main() {
 			return c.JSON(http.StatusOK, result)
 
 		case "insert":
-			error := mongo.Insert(app, Input.Table, Input.Data)
+			insert, error := mongo.Insert(app, Input.Table, Input.Data)
 			if error != nil {
 				e.Logger.Print(error)
 				return c.String(http.StatusNotFound, error.Error())
 			}
-			return c.JSON(http.StatusOK, Input.Data)
+			return c.JSON(http.StatusOK, insert)
 
 		case "update":
 			error := mongo.Update(app, Input.Table, bson.M{"$set": Input.Data}, Input.Where)
@@ -196,7 +197,7 @@ func main() {
 				return c.String(http.StatusNotFound, error.Error())
 			}
 			e.Logger.Print(count)
-			return c.String(http.StatusOK, strconv.Itoa(count))
+			return c.String(http.StatusOK, strconv.Itoa(int(count)))
 
 		case "isEmpty":
 			var r string
@@ -236,7 +237,7 @@ func main() {
 		}
 
 		app := "api"
-		if Input.Auth != "94f3eee0-218f-41fc-9318-94cf5430fc7f" {
+		if Input.Auth != secret {
 			//var result bson.M
 			AppInfo := new(conf.AppInfo)
 			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)

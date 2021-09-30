@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="更新配置文件">
+      <change beforePath="$PROJECT_DIR$/.idea/API-Core.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/API-Core.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libs/mongo/mongo.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/mongo/mongo.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +26,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="/usr/local/go" />
+  <component name="GOROOT" url="file://C:/Program Files/Go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -26,16 +36,19 @@
   <component name="ProjectId" id="1Ueq1fthRyFgSWeXwOiOXrPg4Q2" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="GO_FMT" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.gopath.indexing.explicitly.defined" value="true" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.dep.integrator" value="true" />
     <property name="go.vendoring.notification.had.been.shown" value="true" />
@@ -56,9 +69,9 @@
       <module name="API-Core" />
       <working_directory value="$PROJECT_DIR$/" />
       <kind value="FILE" />
-      <filePath value="$PROJECT_DIR$/main.go" />
       <package value="API-Core" />
       <directory value="$PROJECT_DIR$/" />
+      <filePath value="$PROJECT_DIR$/main.go" />
       <method v="2" />
     </configuration>
     <configuration name="dep:init" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
@@ -83,9 +96,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Build.go build main.go" />
         <item itemvalue="npm.dep:init" />
         <item itemvalue="npm.test" />
-        <item itemvalue="Go Build.go build main.go" />
       </list>
     </recent_temporary>
   </component>
@@ -101,52 +114,23 @@
       </list>
     </option>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="更新配置文件" />
     <option name="LAST_COMMIT_MESSAGE" value="更新配置文件" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="320" y="98" key="#GOROOT" timestamp="1575727209465">
-      <screen x="0" y="23" width="1440" height="820" />
-    </state>
-    <state x="320" y="98" key="#GOROOT/0.23.1440.820@0.23.1440.820" timestamp="1575727209465" />
-    <state x="458" y="203" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1575729304227">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="458" y="203" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1440.900@0.0.1440.900" timestamp="1575729304227" />
-    <state x="303" y="0" key="CommitChangelistDialog2" timestamp="1575731688548">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="303" y="0" key="CommitChangelistDialog2/0.0.1440.900@0.0.1440.900" timestamp="1575731688548" />
-    <state x="303" y="34" key="CommitChangelistDialog2/0.23.1440.820@0.23.1440.820" timestamp="1575728983513" />
-    <state width="1358" height="198" key="GridCell.Tab.0.bottom" timestamp="1575728201235">
-      <screen x="0" y="23" width="1440" height="820" />
-    </state>
-    <state width="1358" height="198" key="GridCell.Tab.0.bottom/0.23.1440.820@0.23.1440.820" timestamp="1575728201235" />
-    <state width="1358" height="198" key="GridCell.Tab.0.center" timestamp="1575728201234">
-      <screen x="0" y="23" width="1440" height="820" />
-    </state>
-    <state width="1358" height="198" key="GridCell.Tab.0.center/0.23.1440.820@0.23.1440.820" timestamp="1575728201234" />
-    <state width="1358" height="198" key="GridCell.Tab.0.left" timestamp="1575728201233">
-      <screen x="0" y="23" width="1440" height="820" />
-    </state>
-    <state width="1358" height="198" key="GridCell.Tab.0.left/0.23.1440.820@0.23.1440.820" timestamp="1575728201233" />
-    <state width="1358" height="198" key="GridCell.Tab.0.right" timestamp="1575728201235">
-      <screen x="0" y="23" width="1440" height="820" />
-    </state>
-    <state width="1358" height="198" key="GridCell.Tab.0.right/0.23.1440.820@0.23.1440.820" timestamp="1575728201235" />
-    <state x="285" y="68" key="SettingsEditor" timestamp="1575729874297">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="285" y="68" key="SettingsEditor/0.0.1440.900@0.0.1440.900" timestamp="1575729874297" />
-    <state x="221" y="72" key="SettingsEditor/0.23.1440.820@0.23.1440.820" timestamp="1575729240814" />
-    <state x="320" y="165" key="Vcs.Push.Dialog.v2" timestamp="1575731690747">
-      <screen x="0" y="0" width="1440" height="900" />
-    </state>
-    <state x="320" y="165" key="Vcs.Push.Dialog.v2/0.0.1440.900@0.0.1440.900" timestamp="1575731690747" />
-    <state x="320" y="173" key="Vcs.Push.Dialog.v2/0.23.1440.820@0.23.1440.820" timestamp="1575728986395" />
   </component>
 </project>
