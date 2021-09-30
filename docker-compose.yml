@@ -1,0 +1,65 @@
+version: "2.2"
+
+services:
+  db:
+    image: mongo:latest
+    volumes:
+      - /home/MongoDB:/data/db
+    ports:
+      - "27017:27017"
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: meiyoumima
+
+  api:
+    links:
+      - db
+    depends_on:
+      - db
+    # image: ireoo/api.core:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 80
+    restart: always
+    environment:
+      PORT: 80
+      MONGODB_URI: mongodb://root:meiyoumima@db:27017
+      MONGODB_OTHER: authSource=admin&authMechanism=SCRAM-SHA-1&ssl=false
+      VIRTUAL_HOST: api.ireoo.com,localhost,127.0.0.1
+      LETSENCRYPT_HOST: api.ireoo.com
+      LETSENCRYPT_EMAIL: s@ireoo.com
+
+  admin:
+    links:
+      - db
+    depends_on:
+      - db
+    image: mongo-express:latest
+    ports:
+      - "8080:80"
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_SERVER: db
+
+  nginxProxy:
+    image: jwilder/nginx-proxy:latest
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /home/DATA/proxy/certs:/etc/nginx/certs
+      - /home/DATA/proxy/dhparam:/etc/nginx/dhparam
+      - /home/DATA/proxy/vhost.d:/etc/nginx/vhost.d
+      - /var/run/docker.sock:/tmp/docker.sock
+      - /home/DATA/proxy/html:/usr/share/nginx/html
+    restart: always
+
+  nginxLetsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    volumes_from:
+      - nginxProxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

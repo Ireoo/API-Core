@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	_ "github.com/Ireoo/API-Core/a"
@@ -266,6 +267,12 @@ func main() {
 			return next(c)
 		}
 	})
+
+	_port := os.Getenv("PORT")
+
+	if _port != "" {
+		port = _port
+	}
 
 	if !ssl {
 		// 使用 port 设置的端口启动服务
