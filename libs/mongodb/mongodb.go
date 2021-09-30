@@ -74,7 +74,7 @@ PoolLimit: 4096
 		}
 	} else {
 		uri = os.Getenv("MONGODB_URI")
-		log.Printf(`Got config: URI: %s`, uri)
+		log.Printf(`Got env config: URI: %s`, uri)
 	}
 
 	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
