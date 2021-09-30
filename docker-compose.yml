@@ -22,15 +22,15 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 80
+      - "81:80"
     restart: always
     environment:
       PORT: 80
       MONGODB_URI: mongodb://root:meiyoumima@db:27017
       MONGODB_OTHER: authSource=admin&authMechanism=SCRAM-SHA-1&ssl=false
-      VIRTUAL_HOST: api.ireoo.com,localhost,127.0.0.1
-      LETSENCRYPT_HOST: api.ireoo.com
-      LETSENCRYPT_EMAIL: s@ireoo.com
+      # VIRTUAL_HOST: api.ireoo.com,localhost,127.0.0.1
+      # LETSENCRYPT_HOST: api.ireoo.com
+      # LETSENCRYPT_EMAIL: s@ireoo.com
 
   admin:
     links:
