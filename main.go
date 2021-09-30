@@ -8,7 +8,7 @@ import (
 	"os"
 	"strconv"
 
-	_ "github.com/Ireoo/API-Core/a"
+	_ "github.com/Ireoo/API-Core/libs/a"
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongodb"
 
