@@ -1,10 +1,9 @@
 FROM node:alpine as admin
 
 RUN apk add --no-cache make git
-RUN mkdir -p /app && git clone https://github.com/Ireoo/API.admin.git /app
+RUN git clone https://github.com/Ireoo/API.admin.git /app
 WORKDIR /app
-RUN npm install
-RUN npm run build
+RUN cd /app && npm i && npm run build
 
 FROM golang:alpine as builder
 
