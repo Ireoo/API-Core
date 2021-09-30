@@ -70,7 +70,8 @@ func main() {
 	// e.Logger.Print(os.Args)
 
 	// 设置静态文件
-	e.Static("/", "static")
+	e.Use(middleware.Static("/static"))
+	// e.Static("/", "static")
 	e.File("/favicon.ico", "static/favicon.ico")
 	e.File("/", "static/index.html")
 	e.File("/admin", "static/admin.html")
