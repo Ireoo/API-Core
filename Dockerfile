@@ -1,11 +1,11 @@
-FROM node:16-alpine as admin
+FROM alpine as admin
 
 RUN apk add --no-cache make git
 RUN git clone https://github.com/Ireoo/API.admin.git /app
 WORKDIR /app
-RUN yarn
-RUN yarn build
-RUN ls -alF
+# RUN yarn
+# RUN yarn build
+# RUN ls -alF
 RUN mv ./dist /dist
 
 FROM golang:alpine as builder
