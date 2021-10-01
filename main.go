@@ -7,17 +7,17 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 
-	_ "github.com/Ireoo/API-Core/libs/a"
+	Info "github.com/Ireoo/API-Core/info"
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongodb"
+	Router "github.com/Ireoo/API-Core/libs/router"
 
 	"golang.org/x/crypto/acme/autocert"
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-	"github.com/labstack/gommon/log"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	Logger "github.com/labstack/gommon/log"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -27,16 +27,18 @@ import (
 // var secret = flag.String("secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
 
 var (
-	// ver    bool
-	ssl    bool
-	port   string
-	secret string
+	ver         bool
+	ssl         bool
+	port        string
+	secret      string
+	command_uri string
 )
 
 func init() {
 	flag.StringVar(&port, "p", "2019", "端口地址")
 	flag.StringVar(&secret, "secret", "94f3eee0-218f-41fc-9318-94cf5430fc7f", "管理权限密钥")
-	// flag.BoolVar(&ver, "v", false, "版本信息")
+	flag.StringVar(&command_uri, "mongodb", "", "MongoDB connect uri")
+	flag.BoolVar(&ver, "v", false, "版本信息")
 	flag.BoolVar(&ssl, "ssl", false, "是否开启SSL功能,默认不开启")
 	flag.Parse()
 }
@@ -48,15 +50,17 @@ var auth = ""
 func main() {
 	// flag.Parse()
 
-	// if ver {
-	// 	//fmt.Printf(`API-Core version: %s`, version)
-	// 	// fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
-	// 	return
-	// }
+	if ver {
+		//fmt.Printf(`API-Core version: %s`, version)
+		fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
+		return
+	}
 
-	// fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
-	// fmt.Println("")
-	// fmt.Println("")
+	fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
+	fmt.Println("")
+	fmt.Println("")
+
+	_ = mongo.New(command_uri)
 
 	e := echo.New()
 
@@ -65,14 +69,17 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Gzip())
+	// 主要用于拦截panic错误并且在控制台打印错误日志，避免echo程序直接崩溃。
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
-	e.Logger.SetLevel(log.DEBUG)
+	e.Logger.SetLevel(Logger.DEBUG)
 
 	// e.Logger.Print(os.Args)
 
 	// 设置静态文件
-	e.Use(middleware.Static("/static"))
-	// e.Static("/", "static")
+	e.Use(middleware.Static("./static"))
+	e.Static("/static", "static/static")
 	e.File("/favicon.ico", "static/favicon.ico")
 	e.File("/", "static/index.html")
 	e.File("/admin", "static/admin.html")
@@ -84,159 +91,7 @@ func main() {
 
 	// 程序核心部分
 	e.POST("/:table/:mode", func(c echo.Context) (err error) {
-		Input := new(conf.Input)
-		if error := c.Bind(Input); error != nil {
-			e.Logger.Print(error)
-		} else {
-			fmt.Println("")
-			e.Logger.Print(Input)
-			// return c.JSON(http.StatusOK, Input)
-		}
-
-		Input.Table = c.Param("table")
-		Input.Mode = c.Param("mode")
-		Input.Auth = auth
-
-		if Input.Auth == "" {
-			return c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-		}
-
-		app := "api"
-		if Input.Auth != secret {
-			//var result bson.M
-			AppInfo := new(conf.AppInfo)
-			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			}
-			app = hex.EncodeToString([]byte(AppInfo.Id))
-			//fmt.Println(app)
-		}
-
-		fmt.Println("")
-		var where bson.M
-		err = bson.UnmarshalJSON([]byte(Input.Where), &where)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		var data bson.M
-		err = bson.UnmarshalJSON([]byte(Input.Data), &data)
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		switch Input.Mode {
-		case "once":
-			var result bson.M
-			error := mongo.FindOne(app, Input.Table, where, bson.M{}, &result)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			e.Logger.Print(result)
-			return c.JSON(http.StatusOK, result)
-
-		case "findOne":
-			var result bson.M
-			error := mongo.FindOne(app, Input.Table, where, bson.M{}, &result)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			e.Logger.Print(result)
-			return c.JSON(http.StatusOK, result)
-
-		case "findAll":
-			result, error := mongo.FindAll(app, Input.Table, where, bson.M{})
-			if error != nil {
-				fmt.Println(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			e.Logger.Print(result)
-			return c.JSON(http.StatusOK, result)
-
-		case "findPage":
-			result, error := mongo.FindPage(app, Input.Table, Input.Other.Page, Input.Other.Limit, where, bson.M{})
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			e.Logger.Print(result)
-			return c.JSON(http.StatusOK, result)
-
-		case "insert":
-			insert, error := mongo.Insert(app, Input.Table, data)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			return c.JSON(http.StatusOK, insert)
-
-		case "update":
-			error := mongo.Update(app, Input.Table, bson.M{"$set": data}, where)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			return c.JSON(http.StatusOK, Input.Data)
-
-		case "updateAll":
-			error := mongo.UpdateAll(app, Input.Table, bson.M{"$set": data}, where)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			return c.JSON(http.StatusOK, Input.Data)
-
-		case "upsert":
-			error := mongo.Upsert(app, Input.Table, bson.M{"$set": data}, where)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			return c.JSON(http.StatusOK, Input.Where)
-
-		case "remove":
-			error := mongo.Remove(app, Input.Table, where)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			return c.JSON(http.StatusOK, Input.Where)
-
-		case "removeAll":
-			error := mongo.RemoveAll(app, Input.Table, where)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			return c.JSON(http.StatusOK, Input.Where)
-
-		case "count":
-			count, error := mongo.Count(app, Input.Table, where)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			e.Logger.Print(count)
-			return c.String(http.StatusOK, strconv.Itoa(int(count)))
-
-		case "isEmpty":
-			var r string
-			if ex := mongo.IsEmpty(app, Input.Table); ex {
-				r = "true"
-			} else {
-				r = "false"
-			}
-			e.Logger.Print(r)
-			return c.String(http.StatusOK, r)
-
-		default:
-			return c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
-		}
-
+		return Router.Table(c, secret, auth)
 	}, func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			auth = c.Request().Header.Get(echo.HeaderAuthorization)

@@ -24,7 +24,7 @@ var (
 	client *mongo.Client
 )
 
-func init() {
+func New(command_uri string) error {
 	exist, _ := basic.PathExists("./api-core.conf")
 	if !exist {
 		_ = ioutil.WriteFile("./api-core.conf", []byte(`# This is a api-core config file.
@@ -54,26 +54,30 @@ PoolLimit: 4096
 		log.Fatalf("Unmarshal: %v", err)
 	}
 
-	uri = os.Getenv("MONGODB_URI")
-	if uri == "" {
-		if config.Host == "" && config.URI == "" {
-			log.Fatalln(config)
-		}
+	if config.Host != "" {
+		// log.Printf(`Got config: HOST: %q`, config.Host)
+		// log.Printf(`Got config: AUTH: %q`, config.Auth)
+		// log.Printf(`Got config: USERNAME: %q`, config.Username)
+		// log.Printf(`Got config: PASSWORD: %q`, config.Password)
+		// log.Printf(`Got config: TIMEOUT: %s`, config.Timeout*time.Millisecond)
+		// log.Printf(`Got config: POOLLIMIT: %d`, config.PoolLimit)
+		uri = "mongodb://" + config.Username + ":" + config.Password + "@" + config.Host + "/" + config.Auth
+	}
+	if config.URI != "" {
+		// log.Printf(`Got config: URI: %s`, config.URI)
+		uri = config.URI
+	}
+	if os.Getenv("MONGODB_URI") != "" {
+		uri = os.Getenv("MONGODB_URI")
+	}
+	if command_uri != "" {
+		uri = command_uri
+	}
 
-		if config.URI == "" {
-			log.Printf(`Got config: HOST: %q`, config.Host)
-			log.Printf(`Got config: AUTH: %q`, config.Auth)
-			log.Printf(`Got config: USERNAME: %q`, config.Username)
-			log.Printf(`Got config: PASSWORD: %q`, config.Password)
-			log.Printf(`Got config: TIMEOUT: %s`, config.Timeout*time.Millisecond)
-			log.Printf(`Got config: POOLLIMIT: %d`, config.PoolLimit)
-			uri = "mongodb://" + config.Username + ":" + config.Password + "@" + config.Host + "/" + config.Auth
-		} else {
-			log.Printf(`Got config: URI: %s`, config.URI)
-			uri = config.URI
-		}
+	if uri == "" {
+		log.Fatalln(`Can't get MongoDB connect uri!`)
 	} else {
-		log.Printf(`Got env config: URI: %s`, uri)
+		log.Printf(`Got MongoDB Connect URI: %s`, uri)
 	}
 
 	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
@@ -92,6 +96,7 @@ PoolLimit: 4096
 	// 		log.Fatalf("Create Session: %s\n", err)
 	// 	}
 	// }()
+	return err
 }
 
 func connect(db, collection string) *mongo.Collection {

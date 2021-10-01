@@ -17,11 +17,13 @@ type MongoDB struct {
 }
 
 type Input struct {
-	Where string `json:"where" form:"where" query:"where"`
-	Data  string `json:"data" form:"data" query:"data"`
+	Where bson.M `json:"where" form:"where" query:"where"`
+	Data  bson.M `json:"data" form:"data" query:"data"`
+	// Other string `json:"other" form:"other" query:"other"`
 	Other struct {
-		Page  int
-		Limit int
+		Page     int    `json:"page" form:"page" query:"page"`
+		Limit    int    `json:"limit" form:"limit" query:"limit"`
+		Distinct bson.M `json:"distinct" form:"distinct" query:"distinct"`
 	} `json:"other" form:"other" query:"other"`
 	Table string `json:"table" form:"table" query:"table"`
 	Mode  string `json:"mode" form:"mode" query:"mode"`
@@ -30,4 +32,9 @@ type Input struct {
 
 type AppInfo struct {
 	Id bson.ObjectId `bson:"_id"`
+}
+
+type Result struct {
+	Success bool
+	Data    interface{}
 }
