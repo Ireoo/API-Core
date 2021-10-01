@@ -142,7 +142,7 @@ func output(c echo.Context, r interface{}, e error) (err error) {
 	}
 	trace(r)
 	out := &conf.Result{
-		Success: false,
+		Success: true,
 		Data:    r,
 	}
 	return c.JSON(http.StatusOK, out)
