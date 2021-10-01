@@ -17,8 +17,12 @@ type MongoDB struct {
 }
 
 type Input struct {
-	Where bson.M `json:"where" form:"where" query:"where"`
-	Data  bson.M `json:"data" form:"data" query:"data"`
+	Where struct {
+		_id bson.ObjectId `json:"_id" form:"_id" query:"_id"`
+	} `json:"where" form:"where" query:"where"`
+	Data struct {
+		_id bson.ObjectId `json:"_id" form:"_id" query:"_id"`
+	} `json:"data" form:"data" query:"data"`
 	// Other string `json:"other" form:"other" query:"other"`
 	Other struct {
 		Page     int    `json:"page" form:"page" query:"page"`
@@ -28,6 +32,7 @@ type Input struct {
 	Table string `json:"table" form:"table" query:"table"`
 	Mode  string `json:"mode" form:"mode" query:"mode"`
 	Auth  string `json:"auth" form:"auth" query:"auth"`
+	App   string `json:"app" form:"app" query:"app"`
 }
 
 type AppInfo struct {

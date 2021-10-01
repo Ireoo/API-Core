@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/hex"
+
 	"log"
 	"net/http"
 
@@ -41,18 +42,6 @@ func Table(c echo.Context, secret, auth string) (err error) {
 		//fmt.Println(app)
 	}
 
-	// fmt.Println("")
-	// var where bson.M
-	// err = bson.UnmarshalJSON([]byte(Input.Where), &where)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// var data bson.M
-	// err = bson.UnmarshalJSON([]byte(Input.Data), &data)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
 	where := Input.Where
 	data := Input.Data
 
@@ -115,7 +104,7 @@ func Table(c echo.Context, secret, auth string) (err error) {
 		return c.String(http.StatusOK, r)
 
 	case "listCollections":
-		result, error := mongo.CollectionNames(app)
+		result, error := mongo.CollectionNames(Input.App)
 		return output(c, result, error)
 
 	default:
