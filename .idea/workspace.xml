@@ -6,14 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="更新配置文件">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/info/Version.go" beforeDir="false" afterPath="$PROJECT_DIR$/info/Version.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/a/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/a/version.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/basic/basic.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/basic/basic.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/conf/conf.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/conf/conf.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/core/core.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/core/core.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/mongo/mongo.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/mongo/mongo.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/mongodb/mongodb.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/mongodb/mongodb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/router/router.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
