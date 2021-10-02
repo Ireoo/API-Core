@@ -1,15 +1,13 @@
 package router
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
+	iJson "github.com/Ireoo/API-Core/libs/json"
 
 	"log"
 	"net/http"
 
 	"github.com/Ireoo/API-Core/libs/conf"
-	"github.com/Ireoo/API-Core/libs/json"
 	mongo "github.com/Ireoo/API-Core/libs/mongodb"
 	"github.com/gin-gonic/gin"
 	"github.com/gookit/color"
@@ -17,38 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 
 	simplejson "github.com/bitly/go-simplejson"
-	// gojsonq "github.com/thedevsaddam/gojsonq"
 )
-
-//func Test(c gin.Context, secret) {
-//	Input := new(conf.Input) //new(conf.Input)
-//	if error := c.Bind(Input); error != nil {
-//		miss(error)
-//	} else {
-//		trace(Input)
-//	}
-//
-//	buf := make([]byte, c.Request().ContentLength)
-//	c.Request().Body.Read(buf)
-//	trace(string(buf))
-//
-//	trace(`[INPUT][WHERE]: `)
-//	trace(reflect.TypeOf(Input.Where))
-//	trace(Input.Where)
-//	mjson, _ := json.Marshal(Input.Where)
-//
-//	where := gojsonq.New().FromString(string(mjson))
-//	trace(reflect.TypeOf(where))
-//	trace(where)
-//	id := gojsonq.New().FromString(string(mjson)).Find("_id")
-//	trace(reflect.TypeOf(id))
-//	trace(id)
-//
-//	value, _ := sjson.Set(string(mjson), "_id", id)
-//	trace(value)
-//	// Input.Where._id = bson.ObjectIdHex(string(id.([]byte)))
-//	return
-//}
 
 func Table(c *gin.Context, secret string) {
 	Input := new(conf.Input)
@@ -63,12 +30,9 @@ func Table(c *gin.Context, secret string) {
 		return
 	}
 
-	Input.Where = ijson.Format(res.Get("where"))
-	Input.Data = ijson.Format(res.Get("data"))
+	Input.Where = iJson.Format(res.Get("where"))
+	Input.Data = iJson.Format(res.Get("data"))
 	Input.App, _ = res.Get("app").String()
-	// trace(where)
-	// trace(data)
-	// trace(_app)
 
 	Input.Table = c.Param("table")
 	Input.Mode = c.Param("mode")
@@ -82,7 +46,6 @@ func Table(c *gin.Context, secret string) {
 
 	app := "api"
 	if Input.Auth != secret {
-		//var result bson.M
 		AppInfo := new(conf.AppInfo)
 		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
 		if error != nil {
@@ -90,10 +53,6 @@ func Table(c *gin.Context, secret string) {
 			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
 		}
 		app = AppInfo.Id
-		// mjson, _ := json.Marshal(AppInfo)
-		// id := gojsonq.New().FromString(string(mjson)).Find("Id")
-		// app = string(id.([]byte)) //md5V(hex.EncodeToString([]byte(AppInfo.Id)))
-		//fmt.Println(app)
 	}
 
 	where := Input.Where
@@ -241,10 +200,4 @@ func output(c *gin.Context, r interface{}, e error) {
 		}
 		c.JSON(http.StatusOK, out)
 	}
-}
-
-func md5V(str string) string {
-	h := md5.New()
-	h.Write([]byte(str))
-	return hex.EncodeToString(h.Sum(nil))
 }

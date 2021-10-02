@@ -9,3 +9,6 @@ API-Core.exe
 
 api-core.conf
 test.sh
+
+.idea/
+.idea/workspace.xml
