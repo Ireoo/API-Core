@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gookit/color"
+	"log"
 	"net/http"
-
 	"os"
 
 	Info "github.com/Ireoo/API-Core/info"
@@ -44,7 +45,9 @@ func main() {
 
 	_ = mongo.New(command_uri)
 
-	gin.SetMode(gin.ReleaseMode)
+	if string(Info.Version) != "unknown version" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	router := gin.Default()
 
@@ -76,5 +79,8 @@ func main() {
 		port = _port
 	}
 
+	fmt.Println("")
+	log.Println(color.FgGreen.Sprintf(color.Bold.Sprintf(" ✔ "))+" Listening "+color.FgGreen.Sprintf("http(s)://0.0.0.0:%s", port))
+	fmt.Println("")
 	router.Run(":" + port)
 }
