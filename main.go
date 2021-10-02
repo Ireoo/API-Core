@@ -62,7 +62,7 @@ func main() {
 	router.StaticFile("/favicon.ico", "./static/favicon.ico")
 
 	// 程序核心部分
-	router.POST("/api/:table/:mode", func(c *gin.Context) {
+	router.POST("/:table/:mode", func(c *gin.Context) {
 		Router.Table(c, secret)
 	})
 
@@ -75,7 +75,6 @@ func main() {
 	if _port != "" {
 		port = _port
 	}
-
 
 	router.Run(":" + port)
 }
