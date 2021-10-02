@@ -18,7 +18,7 @@ RUN go mod download
 RUN make docker
 RUN mv ./bin/API-Core-docker /API-Core
 RUN /API-Core
-#RUN mv ./api-core.conf /api-core.conf
+RUN mv ./api-core.conf /api-core.conf
 
 FROM alpine:latest
 LABEL org.opencontainers.image.source="https://github.com/Ireoo/API-Core"
