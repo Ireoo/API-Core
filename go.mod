@@ -13,5 +13,7 @@ require (
 require (
 	github.com/gookit/color v1.4.2
 	github.com/labstack/echo/v4 v4.6.1
+	github.com/thedevsaddam/gojsonq/v2 v2.5.2
+	github.com/tidwall/sjson v1.2.2
 	go.mongodb.org/mongo-driver v1.7.2
 )

@@ -1,7 +1,10 @@
 package router
 
 import (
+	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
+	"reflect"
 
 	"log"
 	"net/http"
@@ -11,7 +14,40 @@ import (
 	"github.com/gookit/color"
 	"github.com/labstack/echo/v4"
 	"gopkg.in/mgo.v2/bson"
+
+	gojsonq "github.com/thedevsaddam/gojsonq/v2"
+	"github.com/tidwall/sjson"
 )
+
+func Test(c echo.Context, secret, auth string) (err error) {
+	Input := new(conf.Input) //new(conf.Input)
+	if error := c.Bind(Input); error != nil {
+		miss(error)
+	} else {
+		trace(Input)
+	}
+
+	buf := make([]byte, c.Request().ContentLength)
+	c.Request().Body.Read(buf)
+	trace(string(buf))
+
+	trace(`[INPUT][WHERE]: `)
+	trace(reflect.TypeOf(Input.Where))
+	trace(Input.Where)
+	mjson, _ := json.Marshal(Input.Where)
+
+	where := gojsonq.New().FromString(string(mjson))
+	trace(reflect.TypeOf(where))
+	trace(where)
+	id := gojsonq.New().FromString(string(mjson)).Find("_id")
+	trace(reflect.TypeOf(id))
+	trace(id)
+
+	value, _ := sjson.Set(string(mjson), "_id", id)
+	trace(value)
+	// Input.Where._id = bson.ObjectIdHex(string(id.([]byte)))
+	return
+}
 
 func Table(c echo.Context, secret, auth string) (err error) {
 	Input := new(conf.Input)
@@ -38,7 +74,9 @@ func Table(c echo.Context, secret, auth string) (err error) {
 			miss(error)
 			return c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
 		}
-		app = hex.EncodeToString([]byte(AppInfo.Id))
+		mjson, _ := json.Marshal(AppInfo)
+		id := gojsonq.New().FromString(string(mjson)).Find("Id")
+		app = string(id.([]byte)) //md5V(hex.EncodeToString([]byte(AppInfo.Id)))
 		//fmt.Println(app)
 	}
 
@@ -135,4 +173,10 @@ func output(c echo.Context, r interface{}, e error) (err error) {
 		Data:    r,
 	}
 	return c.JSON(http.StatusOK, out)
+}
+
+func md5V(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
 }

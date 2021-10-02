@@ -17,22 +17,18 @@ type MongoDB struct {
 }
 
 type Input struct {
-	Where struct {
-		_id bson.ObjectId `json:"_id" form:"_id" query:"_id"`
-	} `json:"where" form:"where" query:"where"`
-	Data struct {
-		_id bson.ObjectId `json:"_id" form:"_id" query:"_id"`
-	} `json:"data" form:"data" query:"data"`
+	Where bson.M `json:"where,omitempty" form:"where,omitempty" query:"where,omitempty"`
+	Data  bson.M `json:"data,omitempty" form:"data,omitempty" query:"data,omitempty"`
 	// Other string `json:"other" form:"other" query:"other"`
 	Other struct {
-		Page     int    `json:"page" form:"page" query:"page"`
-		Limit    int    `json:"limit" form:"limit" query:"limit"`
+		Page     int    `json:"page,omitempty" form:"page,omitempty" query:"page,omitempty"`
+		Limit    int    `json:"limit,omitempty" form:"limit,omitempty" query:"limit,omitempty"`
 		Distinct bson.M `json:"distinct" form:"distinct" query:"distinct"`
-	} `json:"other" form:"other" query:"other"`
-	Table string `json:"table" form:"table" query:"table"`
-	Mode  string `json:"mode" form:"mode" query:"mode"`
-	Auth  string `json:"auth" form:"auth" query:"auth"`
-	App   string `json:"app" form:"app" query:"app"`
+	} `json:"other,omitempty" form:"other,omitempty" query:"other,omitempty"`
+	Table string `json:"table,omitempty" form:"table,omitempty" query:"table,omitempty"`
+	Mode  string `json:"mode,omitempty" form:"mode,omitempty" query:"mode,omitempty"`
+	Auth  string `json:"auth,omitempty" form:"auth,omitempty" query:"auth,omitempty"`
+	App   string `json:"app,omitempty" form:"app,omitempty" query:"app,omitempty"`
 }
 
 type AppInfo struct {

@@ -5,13 +5,15 @@ import (
 
 	"flag"
 	"fmt"
+	// "log"
 	"net/http"
 	"os"
+	// "strconv"
 
 	Info "github.com/Ireoo/API-Core/info"
+	// _ "github.com/Ireoo/API-Core/libs/a"
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/mongodb"
-	Router "github.com/Ireoo/API-Core/libs/router"
 
 	"golang.org/x/crypto/acme/autocert"
 
@@ -19,6 +21,9 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	Logger "github.com/labstack/gommon/log"
 	"gopkg.in/mgo.v2/bson"
+
+	Router "github.com/Ireoo/API-Core/libs/router"
+	// "github.com/gookit/color"
 )
 
 // var ver = flag.Bool("v", false, "版本信息")
