@@ -3,7 +3,7 @@ package conf
 import (
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type MongoDB struct {
@@ -32,7 +32,7 @@ type Input struct {
 }
 
 type AppInfo struct {
-	Id bson.ObjectId `bson:"_id"`
+	Id string `bson:"_id"`
 }
 
 type Result struct {

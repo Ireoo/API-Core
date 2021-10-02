@@ -1,28 +1,18 @@
 package main
 
 import (
-	"encoding/hex"
-
 	"flag"
 	"fmt"
-	// "log"
-	"net/http"
+
 	"os"
 	// "strconv"
 
 	Info "github.com/Ireoo/API-Core/info"
-	// _ "github.com/Ireoo/API-Core/libs/a"
-	"github.com/Ireoo/API-Core/libs/conf"
-	"github.com/Ireoo/API-Core/libs/mongodb"
 
-	"golang.org/x/crypto/acme/autocert"
-
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	Logger "github.com/labstack/gommon/log"
-	"gopkg.in/mgo.v2/bson"
-
+	mongo "github.com/Ireoo/API-Core/libs/mongodb"
 	Router "github.com/Ireoo/API-Core/libs/router"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	// "github.com/gookit/color"
 )
 
@@ -67,27 +57,23 @@ func main() {
 
 	_ = mongo.New(command_uri)
 
-	e := echo.New()
+	//gin.SetMode(gin.ReleaseMode)
 
-	e.HideBanner = true
+	router := gin.Default()
 
-	e.Use(middleware.Recover())
-	e.Use(middleware.Logger())
-	e.Use(middleware.Gzip())
-	// 主要用于拦截panic错误并且在控制台打印错误日志，避免echo程序直接崩溃。
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
-
-	e.Logger.SetLevel(Logger.DEBUG)
+	corsConf := cors.DefaultConfig()
+	corsConf.AddAllowHeaders("Authorization")
+	corsConf.AllowAllOrigins = true
+	router.Use(cors.New(corsConf))
 
 	// e.Logger.Print(os.Args)
 
 	// 设置静态文件
-	e.Use(middleware.Static("./static"))
-	e.Static("/static", "static/static")
-	e.File("/favicon.ico", "static/favicon.ico")
-	e.File("/", "static/index.html")
-	e.File("/admin", "static/admin.html")
+	//e.Use(middleware.Static("./static"))
+	//e.Static("/static", "static/static")
+	//e.File("/favicon.ico", "static/favicon.ico")
+	//e.File("/", "static/index.html")
+	//e.File("/admin", "static/admin.html")
 
 	// 	e.GET("/", func(c echo.Context) error {
 	// 		return c.HTML(http.StatusOK, `<h1 style="text-align: center;">欢迎使用 iData API 数据中心!</h1>
@@ -95,64 +81,13 @@ func main() {
 	// 	})
 
 	// 程序核心部分
-	e.POST("/:table/:mode", func(c echo.Context) (err error) {
-		return Router.Table(c, secret, auth)
-	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			auth = c.Request().Header.Get(echo.HeaderAuthorization)
-			return next(c)
-		}
+	router.POST("/:table/:mode", func(c *gin.Context) {
+		Router.Table(c, secret)
 	})
 
-	e.POST("/:mode", func(c echo.Context) (err error) {
-		Input := new(conf.Input)
-		if error := c.Bind(Input); error != nil {
-			e.Logger.Print(error)
-		} else {
-			e.Logger.Print(Input)
-		}
-
-		Input.Table = c.Param("table")
-		Input.Mode = c.Param("mode")
-		Input.Auth = auth
-
-		if Input.Auth == "" {
-			return c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-		}
-
-		app := "api"
-		if Input.Auth != secret {
-			//var result bson.M
-			AppInfo := new(conf.AppInfo)
-			error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, bson.M{}, &AppInfo)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			}
-			app = hex.EncodeToString([]byte(AppInfo.Id))
-			//fmt.Println(app)
-		}
-
-		switch Input.Mode {
-		case "collectionNames":
-			names, error := mongo.CollectionNames(app)
-			if error != nil {
-				e.Logger.Print(error)
-				return c.String(http.StatusNotFound, error.Error())
-			}
-			e.Logger.Print(names)
-			return c.JSON(http.StatusOK, names)
-
-		default:
-			return c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
-		}
-
-	}, func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			auth = c.Request().Header.Get(echo.HeaderAuthorization)
-			return next(c)
-		}
-	})
+	// router.POST("/:mode", func(c *gin.Context) {
+	// 	Router.Table(c, secret)
+	// })
 
 	_port := os.Getenv("PORT")
 
@@ -162,23 +97,24 @@ func main() {
 
 	if !ssl {
 		// 使用 port 设置的端口启动服务
-		fmt.Println("")
-		e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + port}))
-		fmt.Println("")
-		fmt.Println("")
+		//fmt.Println("")
+		//e.Logger.Fatal(e.StartServer(&http.Server{Addr: ":" + port}))
+		//fmt.Println("")
+		//fmt.Println("")
+		router.Run(":" + port)
 	} else {
 		// 设置ssl协议缓存地址
-		e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("localhost", "ireoo.com")
-		// Cache certificates
-		e.AutoTLSManager.Cache = autocert.DirCache(".cache")
-
-		// 重定向到https不带www
-		e.Pre(middleware.HTTPSRedirect())
-
-		// use ssl for 443
-		fmt.Println("")
-		e.Logger.Fatal(e.StartAutoTLS(":443"))
-		fmt.Println("")
-		fmt.Println("")
+		//e.AutoTLSManager.HostPolicy = autocert.HostWhitelist("localhost", "ireoo.com")
+		//// Cache certificates
+		//e.AutoTLSManager.Cache = autocert.DirCache(".cache")
+		//
+		//// 重定向到https不带www
+		//e.Pre(middleware.HTTPSRedirect())
+		//
+		//// use ssl for 443
+		//fmt.Println("")
+		//e.Logger.Fatal(e.StartAutoTLS(":443"))
+		//fmt.Println("")
+		//fmt.Println("")
 	}
 }
