@@ -127,16 +127,32 @@ func Insert(db, collection string, doc interface{}) (*mongo.InsertOneResult, err
 	return c.InsertOne(context.TODO(), doc)
 }
 
-func FindOne(db, collection string, query, selector, result interface{}) error {
+func FindOne(db, collection string, query interface{}, other *conf.Other, result interface{}) error {
 	c := connect(db, collection)
 
-	return c.FindOne(context.TODO(), query).Decode(result)
+	opts := options.FindOne()
+	opts.SetSkip(other.Page)
+	if other.Show != nil {
+		opts.SetProjection(other.Show)
+	}
+
+	return c.FindOne(context.TODO(), query, opts).Decode(result)
 }
 
-func FindAll(db, collection string, query, selector interface{}) ([]bson.M, error) {
+func FindAll(db, collection string, query interface{}, other *conf.Other) ([]bson.M, error) {
 	c := connect(db, collection)
 
-	Cursor, err := c.Find(context.TODO(), query)
+	opts := options.Find()
+	opts.SetSkip(other.Page)
+	opts.SetLimit(other.Limit)
+	if other.Sort != nil {
+		opts.SetSort(other.Sort)
+	}
+	if other.Show != nil {
+		opts.SetProjection(other.Show)
+	}
+
+	Cursor, err := c.Find(context.TODO(), query, opts)
 	if err != nil {
 		return []bson.M{}, err
 	}
@@ -145,11 +161,20 @@ func FindAll(db, collection string, query, selector interface{}) ([]bson.M, erro
 	return result, err
 }
 
-func FindPage(db, collection string, page, limit int, query, selector interface{}) ([]bson.M, error) {
+func FindPage(db, collection string, other *conf.Other, query interface{}) ([]bson.M, error) {
 	c := connect(db, collection)
 
-	// return c.Find(query).Select(selector).Skip(page * limit).Limit(limit).All(result)
-	Cursor, err := c.Find(context.TODO(), query)
+	opts := options.Find()
+	opts.SetSkip(other.Page)
+	opts.SetLimit(other.Limit)
+	if other.Sort != nil {
+		opts.SetSort(other.Sort)
+	}
+	if other.Show != nil {
+		opts.SetProjection(other.Show)
+	}
+
+	Cursor, err := c.Find(context.TODO(), query, opts)
 	if err != nil {
 		return []bson.M{}, err
 	}

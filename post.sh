@@ -1,0 +1,1 @@
+curl -v -X POST http://localhost:2019/user/insert -H 'Authorization: 2daf7b88-a52c-4922-9a99-175592080f2f' -H 'Content-Type: application/json' -d '{"where":{"username":"18551410359"},"data":{"username":"18551410359","password":"05539147f9de00e8c94ba8bae3a5c4f9"}, "other":{"limit":100}}'
