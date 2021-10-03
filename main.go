@@ -54,6 +54,7 @@ func main() {
 	if !Debug {
 		if string(Info.Version) != "unknown version" {
 			gin.SetMode(gin.ReleaseMode)
+			Debug = true
 		}
 	}
 
