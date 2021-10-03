@@ -41,7 +41,14 @@ type Other struct {
 }
 
 type AppInfo struct {
-	Id string `bson:"_id"`
+	Id   string `bson:"_id"`
+	Uuid string `bson:"uuid"`
+}
+
+type UserInfo struct {
+	Id       string `bson:"_id"`
+	Username string `bson:"username"`
+	Password string `bson:"password"`
 }
 
 type Result struct {

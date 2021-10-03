@@ -1,28 +1,32 @@
 package router
 
 import (
+	"errors"
 	"fmt"
+
 	iJson "github.com/Ireoo/API-Core/libs/json"
 
-	"log"
 	"net/http"
 
 	"github.com/Ireoo/API-Core/libs/conf"
+	"github.com/Ireoo/API-Core/libs/debug"
 	mongo "github.com/Ireoo/API-Core/libs/mongodb"
 	"github.com/gin-gonic/gin"
-	"github.com/gookit/color"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	simplejson "github.com/bitly/go-simplejson"
 )
 
-func Table(c *gin.Context, secret string) {
+func Table(c *gin.Context, secret string, Debug bool) {
+
+	debug.SetDebug(Debug)
+
 	Input := new(conf.Input)
 
 	buf := make([]byte, c.Request.ContentLength)
 	_, _ = c.Request.Body.Read(buf)
-	fmt.Println(string(buf))
 
 	res, err := simplejson.NewJson(buf)
 	if err != nil {
@@ -58,21 +62,23 @@ func Table(c *gin.Context, secret string) {
 	Input.Mode = c.Param("mode")
 	Input.Auth = c.Request.Header.Get("Authorization")
 
-	// trace(Input)
+	debug.Info("[INPUT]" + " " + string(buf))
 
 	if Input.Auth == "" {
 		c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
 	}
 
 	app := "api"
+	user := ""
 	if Input.Auth != secret {
 		AppInfo := new(conf.AppInfo)
 		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
 		if error != nil {
-			miss(error)
+			debug.Error(error)
 			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
 		}
 		app = AppInfo.Id
+		user = AppInfo.Uuid
 	}
 
 	where := Input.Where
@@ -103,7 +109,7 @@ func Table(c *gin.Context, secret string) {
 			output(c, nil, error)
 		}
 		var result bson.M
-		miss(bson.M{"_id": insert.InsertedID})
+		debug.Error(bson.M{"_id": insert.InsertedID})
 		error = mongo.FindOne(app, Input.Table, bson.M{"_id": insert.InsertedID}, other, &result)
 		output(c, result, error)
 
@@ -139,104 +145,45 @@ func Table(c *gin.Context, secret string) {
 		} else {
 			r = "false"
 		}
-		trace(r)
+		debug.Trace(r)
 		c.String(http.StatusOK, r)
 
 	case "listCollections":
-		result, error := mongo.CollectionNames(Input.App)
+		if Input.App == "" {
+			output(c, nil, errors.New("no app id"))
+			return
+		}
+		_app := app
+		if _app == "api" {
+			_app = Input.App
+		}
+
+		appInfo := new(conf.AppInfo)
+		_id, error := primitive.ObjectIDFromHex(_app)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		error = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		if appInfo.Uuid != user {
+			output(c, nil, errors.New("unauthorized operation"))
+			return
+		}
+		result, error := mongo.CollectionNames(_app)
 		output(c, result, error)
 
 	default:
-		c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
+		output(c, nil, fmt.Errorf("operating mode in existence: %v", Input.Mode))
 	}
-}
-
-func Mode(c *gin.Context, secret string) {
-	Input := new(conf.Input)
-
-	buf := make([]byte, c.Request.ContentLength)
-	_, _ = c.Request.Body.Read(buf)
-	fmt.Println(string(buf))
-
-	res, err := simplejson.NewJson(buf)
-	if err != nil {
-		fmt.Printf("%v\n", err)
-		return
-	}
-
-	Input.Where = iJson.Format(res.Get("where"))
-	Input.Data = iJson.Format(res.Get("data"))
-
-	other := new(conf.Other)
-
-	limit, err := res.Get("other").Get("page").Int64()
-	if err != nil {
-		limit = 20
-	}
-	if limit == 0 {
-		limit = 20
-	}
-	other.Limit = limit
-	page, err := res.Get("other").Get("page").Int64()
-	if err != nil {
-		page = 0
-	}
-	other.Page = page * limit
-	other.Show = iJson.Format(res.Get("other").Get("show"))
-	other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
-	other.Sort = iJson.Format(res.Get("other").Get("sort"))
-
-	Input.App, _ = res.Get("app").String()
-
-	Input.Table = c.Param("table")
-	Input.Mode = c.Param("mode")
-	Input.Auth = c.Request.Header.Get("Authorization")
-
-	// trace(Input)
-
-	if Input.Auth == "" {
-		c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-	}
-
-	app := "api"
-	if Input.Auth != secret {
-		//var result bson.M
-		AppInfo := new(conf.AppInfo)
-		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
-		if error != nil {
-			miss(error)
-			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-		}
-		app = AppInfo.Id
-		//fmt.Println(app)
-	}
-
-	switch Input.Mode {
-	case "collectionNames":
-		names, error := mongo.CollectionNames(app)
-		if error != nil {
-			miss(error)
-			c.String(http.StatusNotFound, error.Error())
-		}
-		trace(names)
-		c.JSON(http.StatusOK, names)
-
-	default:
-		c.String(http.StatusNotFound, "不存在的操作模式："+Input.Mode)
-	}
-}
-
-func trace(message interface{}) {
-	log.Println(color.FgGreen.Render(message))
-}
-
-func miss(message interface{}) {
-	log.Println(color.FgRed.Render(message))
 }
 
 func output(c *gin.Context, r interface{}, e error) {
 	if e != nil {
-		miss(e)
+		debug.Error(e)
 		out := &conf.Result{
 			Success: false,
 			Data:    e.Error(),
@@ -244,7 +191,7 @@ func output(c *gin.Context, r interface{}, e error) {
 		c.JSON(http.StatusOK, out)
 	}
 	if r != nil {
-		trace(r)
+		debug.Trace(r)
 		out := &conf.Result{
 			Success: true,
 			Data:    r,

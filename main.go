@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/gookit/color"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gookit/color"
 
 	Info "github.com/Ireoo/API-Core/info"
 
@@ -19,6 +20,7 @@ import (
 var (
 	ver         bool
 	ssl         bool
+	Debug       bool
 	port        string
 	secret      string
 	command_uri string
@@ -30,27 +32,35 @@ func init() {
 	flag.StringVar(&command_uri, "mongodb", "", "MongoDB connect uri")
 	flag.BoolVar(&ver, "v", false, "版本信息")
 	flag.BoolVar(&ssl, "ssl", false, "是否开启SSL功能,默认不开启")
+	flag.BoolVar(&Debug, "debug", false, "是否开启Debug功能,默认不开启")
 	flag.Parse()
 }
 
 func main() {
+
+	// 输出版本信息
 	if ver {
 		fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
 		return
 	}
-
 	fmt.Printf("API-Core version: %s\nbuild time: %s\n", Info.Version, Info.BuildTime)
 	fmt.Println("")
 	fmt.Println("")
 
+	// 建立与数据库的连接
 	_ = mongo.New(command_uri)
 
-	if string(Info.Version) != "unknown version" {
-		gin.SetMode(gin.ReleaseMode)
+	// 是否开启debug
+	if !Debug {
+		if string(Info.Version) != "unknown version" {
+			gin.SetMode(gin.ReleaseMode)
+		}
 	}
 
+	// 初始化网页服务器
 	router := gin.Default()
 
+	// 设置 CORS
 	corsConf := cors.DefaultConfig()
 	corsConf.AddAllowHeaders("Authorization")
 	corsConf.AllowAllOrigins = true
@@ -66,21 +76,18 @@ func main() {
 
 	// 程序核心部分
 	router.POST("/:table/:mode", func(c *gin.Context) {
-		Router.Table(c, secret)
+		Router.Table(c, secret, Debug)
 	})
 
-	//router.POST("/:mode", func(c *gin.Context) {
-	//	Router.Mode(c, secret)
-	//})
-
+	// 获取启动服务绑定的端口
 	_port := os.Getenv("PORT")
-
 	if _port != "" {
 		port = _port
 	}
 
+	// 启动服务
 	fmt.Println("")
-	log.Println(color.FgGreen.Sprintf(color.Bold.Sprintf(" ✔ "))+" Listening "+color.FgGreen.Sprintf("http(s)://0.0.0.0:%s", port))
+	log.Println(color.FgGreen.Sprintf(color.Bold.Sprintf(" ✔ ")) + " Listening " + color.FgGreen.Sprintf("http(s)://0.0.0.0:%s", port))
 	fmt.Println("")
 	router.Run(":" + port)
 }
