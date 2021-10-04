@@ -52,7 +52,7 @@ func main() {
 
 	// 是否开启debug
 	if !Debug {
-		Debug = os.Getenv("PORT") == "true"
+		Debug = os.Getenv("debug") == "true"
 		if string(Info.Version) != "unknown version" {
 			if Debug {
 				gin.SetMode(gin.DebugMode)
