@@ -28,6 +28,7 @@ services:
     restart: always
     environment:
       PORT: 80
+      DEBUG: true
       MONGODB_URI: mongodb://root:meiyoumima@db:27017
       MONGODB_OTHER: authSource=admin&authMechanism=SCRAM-SHA-1&ssl=false
       VIRTUAL_HOST: 155.248.201.2,api.ireoo.com
