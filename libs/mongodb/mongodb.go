@@ -34,7 +34,7 @@ Host: "127.0.0.1:27017"
 Auth: "admin"
 Username: "root"
 Password: "meiyoumima"
-Timeout: 200
+Timeout: 20000
 PoolLimit: 4096
 #URI: "127.0.0.1:27017" # 如果不通过此URI直接连接，请删掉或者注释掉`), 0666)
 
