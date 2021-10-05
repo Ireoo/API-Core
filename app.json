@@ -1,0 +1,18 @@
+{
+    "name": "API-Core",
+    "description": "Deploy API-Core on Heroku.",
+    "keywords": ["API-Core","API"],
+    "env": {
+        "DEBUG": {
+            "description": "Debug",
+            "value": "true"
+        },
+        "MONGODB_URI": {
+            "description": "Mongodb connect address",
+            "value": "64"
+        }
+    },
+    "website": "",
+    "repository": "https://github.com/Ireoo/API-Core",
+    "stack": "container"
+}
