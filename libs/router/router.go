@@ -109,9 +109,10 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		insert, error := mongo.Insert(app, Input.Table, data)
 		if error != nil {
 			output(c, nil, error)
+			return
 		}
 		var result bson.M
-		debug.Error(bson.M{"_id": insert.InsertedID})
+		debug.Info(bson.M{"_id": insert.InsertedID})
 		error = mongo.FindOne(app, Input.Table, bson.M{"_id": insert.InsertedID}, other, &result)
 		output(c, result, error)
 
