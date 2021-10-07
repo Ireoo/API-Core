@@ -66,6 +66,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 
 	if Input.Auth == "" {
 		c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		return
 	}
 
 	app := "api"
@@ -76,6 +77,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		if error != nil {
 			debug.Error(error)
 			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			return
 		}
 		app = AppInfo.Id
 		user = AppInfo.Uuid
