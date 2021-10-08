@@ -230,11 +230,13 @@ func EnsureIndex(db, collection string, selector []string) error {
 	return err
 }
 
-func Indexes(db, collection string) *mongo.Cursor {
+func Indexes(db, collection string) []bson.M {
 	c := connect(db, collection)
 
 	cur, _ := c.Indexes().List(context.TODO())
-	return cur
+	var result []bson.M
+	_ = cur.All(context.TODO(), &result)
+	return result
 }
 
 /**

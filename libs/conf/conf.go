@@ -21,10 +21,11 @@ type Input struct {
 	Data  bson.M `json:"data,omitempty" form:"data,omitempty" query:"data,omitempty"`
 	// Other string `json:"other" form:"other" query:"other"`
 	Other struct {
-		Page     int64  `json:"page,omitempty" form:"page,omitempty" query:"page,omitempty"`
-		Limit    int64  `json:"limit,omitempty" form:"limit,omitempty" query:"limit,omitempty"`
-		Show     bson.M `json:"show,omitempty" form:"show,omitempty" query:"show,omitempty"`
-		Distinct bson.M `json:"distinct" form:"distinct" query:"distinct"`
+		Page     int64    `json:"page,omitempty" form:"page,omitempty" query:"page,omitempty"`
+		Limit    int64    `json:"limit,omitempty" form:"limit,omitempty" query:"limit,omitempty"`
+		Show     bson.M   `json:"show,omitempty" form:"show,omitempty" query:"show,omitempty"`
+		Distinct bson.M   `json:"distinct" form:"distinct" query:"distinct"`
+		Indexes  []string `json:"indexes" form:"indexes" query:"indexes"`
 	} `json:"other,omitempty" form:"other,omitempty" query:"other,omitempty"`
 	Table string `json:"table,omitempty" form:"table,omitempty" query:"table,omitempty"`
 	Mode  string `json:"mode,omitempty" form:"mode,omitempty" query:"mode,omitempty"`
@@ -38,6 +39,7 @@ type Other struct {
 	Show     bson.M
 	Distinct bson.M
 	Sort     bson.M
+	Indexes  []string
 }
 
 type AppInfo struct {

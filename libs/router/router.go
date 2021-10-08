@@ -55,6 +55,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	other.Show = iJson.Format(res.Get("other").Get("show"))
 	other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
 	other.Sort = iJson.Format(res.Get("other").Get("sort"))
+	other.Indexes, _ = res.Get("other").Get("indexes").StringArray()
 
 	Input.App, _ = res.Get("app").String()
 
@@ -148,8 +149,20 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		} else {
 			r = "false"
 		}
-		debug.Trace(r)
-		c.String(http.StatusOK, r)
+		output(c, r, nil)
+
+	case "setIndex":
+		var r string
+		if ex := mongo.EnsureIndex(app, Input.Table, other.Indexes); ex == nil {
+			r = "true"
+		} else {
+			r = "false"
+		}
+		output(c, r, nil)
+
+	case "getIndexes":
+		r := mongo.Indexes(app, Input.Table)
+		output(c, r, nil)
 
 	case "listCollections":
 		if Input.App == "" {
@@ -178,6 +191,34 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		}
 		result, error := mongo.CollectionNames(_app)
 		output(c, result, error)
+
+	case "drop":
+		if Input.App == "" {
+			output(c, nil, errors.New("no app id"))
+			return
+		}
+		_app := app
+		if _app == "api" {
+			_app = Input.App
+		}
+
+		appInfo := new(conf.AppInfo)
+		_id, error := primitive.ObjectIDFromHex(_app)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		error = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		if appInfo.Uuid != user {
+			output(c, nil, errors.New("unauthorized operation"))
+			return
+		}
+		err := mongo.DropDatabase(_app)
+		output(c, nil, err)
 
 	default:
 		output(c, nil, fmt.Errorf("operating mode in existence: %v", Input.Mode))
