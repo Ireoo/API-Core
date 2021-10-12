@@ -12,6 +12,10 @@ func SetDebug(d bool) {
 	debug = d
 }
 
+func GetDebug() bool {
+	return debug
+}
+
 func Trace(message interface{}) {
 	if debug {
 		log.Println(color.FgGreen.Sprintf(color.Bold.Sprintf(" ✔ ")) + color.FgGreen.Render(message))
@@ -26,7 +30,7 @@ func Error(message interface{}) {
 
 func Info(message interface{}) {
 	if debug {
-		log.Println(color.Bold.Sprintf(" ➽ ") + message.(string))
+		log.Println(color.Bold.Sprintf(" ➽ ") + color.FgDefault.Render(message))
 	}
 }
 

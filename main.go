@@ -87,6 +87,10 @@ func main() {
 		Router.Table(c, secret, Debug)
 	})
 
+	router.GET("/:table/:mode", func(c *gin.Context) {
+		Router.TableGet(c, secret, Debug)
+	})
+
 	// 获取启动服务绑定的端口
 	_port := os.Getenv("PORT")
 	if _port != "" {

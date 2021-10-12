@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -225,6 +226,153 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	}
 }
 
+func TableGet(c *gin.Context, secret string, Debug bool) {
+
+	debug.SetDebug(Debug)
+
+	Input := new(conf.Input)
+
+	buf := make([]byte, c.Request.ContentLength)
+	_, _ = c.Request.Body.Read(buf)
+
+	other := new(conf.Other)
+
+	res, err := simplejson.NewJson(buf)
+	if err != nil {
+		_ = bson.UnmarshalExtJSON([]byte(c.Query("where")), true, &Input.Where)
+		_ = bson.UnmarshalExtJSON([]byte(c.Query("data")), true, &Input.Data)
+		_ = bson.UnmarshalExtJSON([]byte(c.Query("other")), true, &other)
+		_ = bson.UnmarshalExtJSON([]byte(c.Query("app")), true, &Input.App)
+
+		//fmt.Printf("%v\n", err)
+		//output(c, nil, errors.New("No data!"))
+		//return
+	} else {
+
+		Input.Where = iJson.Format(res.Get("where"))
+		Input.Data = iJson.Format(res.Get("data"))
+
+		limit, err := res.Get("other").Get("page").Int64()
+		if err != nil {
+			limit = 20
+		}
+		if limit == 0 {
+			limit = 20
+		}
+		other.Limit = limit
+		page, err := res.Get("other").Get("page").Int64()
+		if err != nil {
+			page = 0
+		}
+		other.Page = page * limit
+		other.Show = iJson.Format(res.Get("other").Get("show"))
+		other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
+		other.Sort = iJson.Format(res.Get("other").Get("sort"))
+		other.Indexes, _ = res.Get("other").Get("indexes").StringArray()
+
+		Input.App, _ = res.Get("app").String()
+	}
+
+	Input.Table = c.Param("table")
+	Input.Mode = c.Param("mode")
+	Input.Auth = c.Request.Header.Get("Authorization")
+
+	if debug.GetDebug() {
+		jsonStr, _ := json.Marshal(Input)
+		debug.Info("[INPUT]" + "  " + string(jsonStr))
+	}
+
+	if Input.Auth == "" {
+		c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		return
+	}
+
+	app := "api"
+	user := ""
+	if Input.Auth != secret {
+		AppInfo := new(conf.AppInfo)
+		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
+		if error != nil {
+			debug.Error(error)
+			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			return
+		}
+		app = AppInfo.Id
+		user = AppInfo.Uuid
+	}
+
+	where := Input.Where
+
+	switch Input.Mode {
+	case "once":
+		var result bson.M
+		error := mongo.FindOne(app, Input.Table, where, other, &result)
+		output(c, result, error)
+
+	case "findOne":
+		var result bson.M
+		error := mongo.FindOne(app, Input.Table, where, other, &result)
+		output(c, result, error)
+
+	case "findAll":
+		result, error := mongo.FindAll(app, Input.Table, where, other)
+		output(c, result, error)
+
+	case "find":
+		result, error := mongo.FindPage(app, Input.Table, other, where)
+		output(c, result, error)
+
+	case "count":
+		count, error := mongo.Count(app, Input.Table, where)
+		output(c, count, error)
+		// return c.String(http.StatusOK, strconv.Itoa(int(count)))
+
+	case "isEmpty":
+		var r string
+		if ex := mongo.IsEmpty(app, Input.Table); ex {
+			r = "true"
+		} else {
+			r = "false"
+		}
+		output(c, r, nil)
+
+	case "getIndexes":
+		r := mongo.Indexes(app, Input.Table)
+		output(c, r, nil)
+
+	case "listCollections":
+		if Input.App == "" {
+			output(c, nil, errors.New("no app id"))
+			return
+		}
+		_app := app
+		if _app == "api" {
+			_app = Input.App
+		}
+
+		appInfo := new(conf.AppInfo)
+		_id, error := primitive.ObjectIDFromHex(_app)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		error = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		if appInfo.Uuid != user {
+			output(c, nil, errors.New("unauthorized operation"))
+			return
+		}
+		result, error := mongo.CollectionNames(_app)
+		output(c, result, error)
+
+	default:
+		output(c, nil, fmt.Errorf("operating mode in existence: %v", Input.Mode))
+	}
+}
+
 func output(c *gin.Context, r interface{}, e error) {
 	if e != nil {
 		debug.Error(e)
@@ -235,7 +383,10 @@ func output(c *gin.Context, r interface{}, e error) {
 		c.JSON(http.StatusOK, out)
 	}
 	if r != nil {
-		debug.Trace(r)
+		if debug.GetDebug() {
+			jsonStr, _ := json.Marshal(r)
+			debug.Trace("[OUTPUT]" + " " + string(jsonStr))
+		}
 		out := &conf.Result{
 			Success: true,
 			Data:    r,
