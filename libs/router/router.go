@@ -119,15 +119,15 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		output(c, result, error)
 
 	case "update":
-		error := mongo.Update(app, Input.Table, data, where)
+		error := mongo.Update(app, Input.Table, where, bson.M{"$set": data})
 		output(c, data, error)
 
 	case "updateAll":
-		error := mongo.UpdateAll(app, Input.Table, data, where)
+		error := mongo.UpdateAll(app, Input.Table, where, bson.M{"$set": data})
 		output(c, data, error)
 
 	case "upsert":
-		error := mongo.Upsert(app, Input.Table, data, where)
+		error := mongo.Upsert(app, Input.Table, where, bson.M{"$set": data})
 		output(c, data, error)
 
 	case "remove":
@@ -381,7 +381,6 @@ func output(c *gin.Context, r interface{}, e error) {
 			Data:    e.Error(),
 		}
 		c.JSON(http.StatusOK, out)
-		return
 	}
 	if r != nil {
 		if debug.GetDebug() {
