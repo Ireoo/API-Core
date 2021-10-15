@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gookit/color"
 
 	iJson "github.com/Ireoo/API-Core/libs/json"
 
@@ -277,11 +278,12 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 	if debug.GetDebug() {
 		jsonStr, _ := json.Marshal(Input)
-		debug.Info("[INPUT]" + "  " + string(jsonStr))
+		debug.Info("[INPUT]" + " " + string(jsonStr))
 	}
 
 	if Input.Auth == "" {
-		c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		output(c, nil, errors.New("Not Authorization!"))
 		return
 	}
 
@@ -291,8 +293,9 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 		AppInfo := new(conf.AppInfo)
 		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
 		if error != nil {
-			debug.Error(error)
-			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			//debug.Error(error)
+			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			output(c, nil, errors.New("The authorization verification information does not exist. Please verify."))
 			return
 		}
 		app = AppInfo.Id
@@ -373,10 +376,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 func output(c *gin.Context, r interface{}, e error) {
 	if e != nil {
-		if debug.GetDebug() {
-			jsonStr, _ := json.Marshal(r)
-			debug.Error("[ERROR ]" + " " + string(jsonStr))
-		}
+		debug.Error("[ERROR]" + " " + color.FgDefault.Render(e))
 		out := &conf.Result{
 			Success: false,
 			Data:    e.Error(),
