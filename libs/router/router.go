@@ -381,6 +381,7 @@ func output(c *gin.Context, r interface{}, e error) {
 			Data:    e.Error(),
 		}
 		c.JSON(http.StatusOK, out)
+		return
 	}
 	if r != nil {
 		if debug.GetDebug() {
