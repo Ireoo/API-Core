@@ -67,7 +67,8 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	debug.Info("[INPUT]" + " " + string(buf))
 
 	if Input.Auth == "" {
-		c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
+		output(c, nil, errors.New("Not Authorization!"))
 		return
 	}
 
@@ -77,8 +78,9 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		AppInfo := new(conf.AppInfo)
 		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
 		if error != nil {
-			debug.Error(error)
-			c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			//debug.Error(error)
+			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
+			output(c, nil, errors.New("The authorization verification information does not exist. Please verify."))
 			return
 		}
 		app = AppInfo.Id
@@ -120,10 +122,6 @@ func Table(c *gin.Context, secret string, Debug bool) {
 
 	case "update":
 		error := mongo.Update(app, Input.Table, where, bson.M{"$set": data})
-		output(c, data, error)
-
-	case "updateAll":
-		error := mongo.UpdateAll(app, Input.Table, where, bson.M{"$set": data})
 		output(c, data, error)
 
 	case "upsert":
