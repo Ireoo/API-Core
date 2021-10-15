@@ -183,25 +183,25 @@ func FindPage(db, collection string, other *conf.Other, query interface{}) ([]bs
 	return result, err
 }
 
-func Update(db, collection string, selector, update interface{}) error {
+func Update(db, collection string, where, update interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.UpdateOne(context.TODO(), update, selector)
+	_, err := c.UpdateOne(context.TODO(), where, update)
 	return err
 }
 
-func Upsert(db, collection string, selector, update interface{}) error {
+func Upsert(db, collection string, where, update interface{}) error {
 	c := connect(db, collection)
 
 	opts := options.Update().SetUpsert(true)
-	_, err := c.UpdateOne(context.TODO(), update, selector, opts)
+	_, err := c.UpdateOne(context.TODO(), where, update, opts)
 	return err
 }
 
-func UpdateAll(db, collection string, selector, update interface{}) error {
+func UpdateAll(db, collection string, where, update interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.UpdateMany(context.TODO(), update, selector)
+	_, err := c.UpdateMany(context.TODO(), where, update)
 	return err
 }
 
