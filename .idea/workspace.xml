@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/mongodb/mongodb.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/mongodb/mongodb.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/libs/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/router/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -118,7 +116,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="更新配置文件" />
     <MESSAGE value="增加get方法" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加get方法" />
+    <MESSAGE value="优化upsert等操作" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化upsert等操作" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
