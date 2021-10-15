@@ -186,7 +186,7 @@ func FindPage(db, collection string, other *conf.Other, query interface{}) ([]bs
 func Update(db, collection string, where, update interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.UpdateOne(context.TODO(), where, update)
+	_, err := c.UpdateMany(context.TODO(), where, update)
 	return err
 }
 
@@ -195,11 +195,7 @@ func Upsert(db, collection string, where, update interface{}) error {
 
 	opts := options.Update()
 	opts.SetUpsert(true)
-	_, err := c.UpdateOne(context.TODO(), where, update, opts)
-
-	if err != nil {
-		_, err = c.UpdateOne(context.TODO(), where, update)
-	}
+	_, err := c.UpdateMany(context.TODO(), where, update, opts)
 	return err
 }
 

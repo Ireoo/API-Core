@@ -375,7 +375,10 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 func output(c *gin.Context, r interface{}, e error) {
 	if e != nil {
-		debug.Error(e)
+		if debug.GetDebug() {
+			jsonStr, _ := json.Marshal(r)
+			debug.Trace("[OUTPUT]" + " " + string(jsonStr))
+		}
 		out := &conf.Result{
 			Success: false,
 			Data:    e.Error(),
