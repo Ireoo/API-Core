@@ -195,6 +195,10 @@ func Upsert(db, collection string, where, update interface{}) error {
 
 	opts := options.Update().SetUpsert(true)
 	_, err := c.UpdateOne(context.TODO(), where, update, opts)
+
+	if err != nil {
+		_, err = c.UpdateOne(context.TODO(), where, update)
+	}
 	return err
 }
 
@@ -251,7 +255,8 @@ func connectDB(db string) *mongo.Database {
 func CollectionNames(db string) ([]string, error) {
 	d := connectDB(db)
 
-	return d.ListCollectionNames(context.TODO(), bson.M{}) //.CollectionNames()
+	opts := options.ListCollections()
+	return d.ListCollectionNames(context.TODO(), bson.M{}, opts) //.CollectionNames()
 }
 
 // func AddUser(db string, username string, password string, readOnly bool) error {
