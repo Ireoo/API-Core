@@ -65,7 +65,11 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	Input.Mode = c.Param("mode")
 	Input.Auth = c.Request.Header.Get("Authorization")
 
-	debug.Info("[INPUT]" + " " + string(buf))
+	//debug.Info("[INPUT]" + " " + string(buf))
+	if debug.GetDebug() {
+		jsonStr, _ := json.Marshal(Input)
+		debug.Info("[INPUT]" + " " + string(jsonStr))
+	}
 
 	if Input.Auth == "" {
 		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
