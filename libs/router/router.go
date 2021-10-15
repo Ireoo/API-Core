@@ -377,7 +377,7 @@ func output(c *gin.Context, r interface{}, e error) {
 	if e != nil {
 		if debug.GetDebug() {
 			jsonStr, _ := json.Marshal(r)
-			debug.Trace("[OUTPUT]" + " " + string(jsonStr))
+			debug.Error("[ERROR ]" + " " + string(jsonStr))
 		}
 		out := &conf.Result{
 			Success: false,
