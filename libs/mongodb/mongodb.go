@@ -193,7 +193,8 @@ func Update(db, collection string, where, update interface{}) error {
 func Upsert(db, collection string, where, update interface{}) error {
 	c := connect(db, collection)
 
-	opts := options.Update().SetUpsert(true)
+	opts := options.Update()
+	opts.SetUpsert(true)
 	_, err := c.UpdateOne(context.TODO(), where, update, opts)
 
 	if err != nil {
