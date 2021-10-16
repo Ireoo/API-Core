@@ -246,7 +246,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Data)
 	decoded, _ = url.QueryUnescape(c.Query("other"))
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &other)
-	// _ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Other)
+	//fmt.Println(other.Sort["speedtest"])
 	decoded, _ = url.QueryUnescape(c.Query("app"))
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.App)
 	decoded, _ = url.QueryUnescape(c.Query("auth"))
@@ -284,6 +284,11 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	}
 
 	where := Input.Where
+
+	// 处理sort
+	for k, v := range other.Sort {
+		other.SortFormat = append(other.SortFormat, bson.E{k, v})
+	}
 
 	switch Input.Mode {
 	case "once":

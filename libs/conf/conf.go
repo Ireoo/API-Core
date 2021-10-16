@@ -33,6 +33,7 @@ type Other struct {
 	Distinct bson.M   `json:"distinct,omitempty" form:"distinct,omitempty" query:"distinct,omitempty"`
 	Sort     bson.M   `json:"sort,omitempty" form:"sort,omitempty" query:"sort,omitempty"`
 	Indexes  []string `json:"indexes,omitempty" form:"indexes,omitempty" query:"indexes,omitempty"`
+	SortFormat bson.D `json:"sortFormat,omitempty" form:"sortFormat,omitempty" query:"sortFormat,omitempty"`
 }
 
 type AppInfo struct {
