@@ -246,6 +246,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Data)
 	decoded, _ = url.QueryUnescape(c.Query("other"))
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &other)
+	// _ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Other)
 	decoded, _ = url.QueryUnescape(c.Query("app"))
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.App)
 	decoded, _ = url.QueryUnescape(c.Query("auth"))
@@ -254,6 +255,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	} else {
 		Input.Auth = c.Request.Header.Get("Authorization")
 	}
+	Input.Other = other
 
 	if debug.GetDebug() {
 		jsonStr, _ := json.Marshal(Input)
