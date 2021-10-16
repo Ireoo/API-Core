@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gookit/color"
+	"net/url"
 
 	iJson "github.com/Ireoo/API-Core/libs/json"
 
@@ -18,7 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
-	simplejson "github.com/bitly/go-simplejson"
+	simpleJson "github.com/bitly/go-simplejson"
 )
 
 func Table(c *gin.Context, secret string, Debug bool) {
@@ -30,7 +31,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	buf := make([]byte, c.Request.ContentLength)
 	_, _ = c.Request.Body.Read(buf)
 
-	res, err := simplejson.NewJson(buf)
+	res, err := simpleJson.NewJson(buf)
 	if err != nil {
 		fmt.Printf("%v\n", err)
 		return
@@ -234,51 +235,25 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	debug.SetDebug(Debug)
 
 	Input := new(conf.Input)
-
-	buf := make([]byte, c.Request.ContentLength)
-	_, _ = c.Request.Body.Read(buf)
-
 	other := new(conf.Other)
-
-	res, err := simplejson.NewJson(buf)
-	if err != nil {
-		_ = bson.UnmarshalExtJSON([]byte(c.Query("where")), true, &Input.Where)
-		_ = bson.UnmarshalExtJSON([]byte(c.Query("data")), true, &Input.Data)
-		_ = bson.UnmarshalExtJSON([]byte(c.Query("other")), true, &other)
-		_ = bson.UnmarshalExtJSON([]byte(c.Query("app")), true, &Input.App)
-
-		//fmt.Printf("%v\n", err)
-		//output(c, nil, errors.New("No data!"))
-		//return
-	} else {
-
-		Input.Where = iJson.Format(res.Get("where"))
-		Input.Data = iJson.Format(res.Get("data"))
-
-		limit, err := res.Get("other").Get("page").Int64()
-		if err != nil {
-			limit = 20
-		}
-		if limit == 0 {
-			limit = 20
-		}
-		other.Limit = limit
-		page, err := res.Get("other").Get("page").Int64()
-		if err != nil {
-			page = 0
-		}
-		other.Page = page * limit
-		other.Show = iJson.Format(res.Get("other").Get("show"))
-		other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
-		other.Sort = iJson.Format(res.Get("other").Get("sort"))
-		other.Indexes, _ = res.Get("other").Get("indexes").StringArray()
-
-		Input.App, _ = res.Get("app").String()
-	}
 
 	Input.Table = c.Param("table")
 	Input.Mode = c.Param("mode")
-	Input.Auth = c.Request.Header.Get("Authorization")
+
+	decoded, _ := url.QueryUnescape(c.Query("where"))
+	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Where)
+	decoded, _ = url.QueryUnescape(c.Query("data"))
+	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Data)
+	decoded, _ = url.QueryUnescape(c.Query("other"))
+	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &other)
+	decoded, _ = url.QueryUnescape(c.Query("app"))
+	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.App)
+	decoded, _ = url.QueryUnescape(c.Query("auth"))
+	if decoded != "" {
+		Input.Auth = decoded
+	} else {
+		Input.Auth = c.Request.Header.Get("Authorization")
+	}
 
 	if debug.GetDebug() {
 		jsonStr, _ := json.Marshal(Input)
