@@ -27,13 +27,15 @@ type Input struct {
 }
 
 type Other struct {
-	Page     int64    `json:"page,omitempty" form:"page,omitempty" query:"page,omitempty"`
-	Limit    int64    `json:"limit,omitempty" form:"limit,omitempty" query:"limit,omitempty"`
-	Show     bson.M   `json:"show,omitempty" form:"show,omitempty" query:"show,omitempty"`
-	Distinct bson.M   `json:"distinct,omitempty" form:"distinct,omitempty" query:"distinct,omitempty"`
-	Sort     bson.M   `json:"sort,omitempty" form:"sort,omitempty" query:"sort,omitempty"`
-	Indexes  []string `json:"indexes,omitempty" form:"indexes,omitempty" query:"indexes,omitempty"`
-	SortFormat bson.D `json:"sortFormat,omitempty" form:"sortFormat,omitempty" query:"sortFormat,omitempty"`
+	Page       int64    `json:"page,omitempty" form:"page,omitempty" query:"page,omitempty"`
+	Limit      int64    `json:"limit,omitempty" form:"limit,omitempty" query:"limit,omitempty"`
+	Show       bson.M   `json:"show,omitempty" form:"show,omitempty" query:"show,omitempty"`
+	Distinct   bson.M   `json:"distinct,omitempty" form:"distinct,omitempty" query:"distinct,omitempty"`
+	Sort       bson.M   `json:"sort,omitempty" form:"sort,omitempty" query:"sort,omitempty"`
+	Indexes    []string `json:"indexes,omitempty" form:"indexes,omitempty" query:"indexes,omitempty"`
+	Upsert     bool     `json:"upsert" form:"upsert" query:"upsert"`
+	Multi      bool     `json:"multi" form:"multi" query:"multi"`
+	SortFormat bson.D   `json:"sortFormat,omitempty" form:"sortFormat,omitempty" query:"sortFormat,omitempty"`
 }
 
 type AppInfo struct {

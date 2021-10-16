@@ -59,12 +59,15 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
 	other.Sort = iJson.Format(res.Get("other").Get("sort"))
 	other.Indexes, _ = res.Get("other").Get("indexes").StringArray()
+	other.Upsert, _ = res.Get("other").Get("upsert").Bool()
+	other.Multi, _ = res.Get("other").Get("multi").Bool()
 
 	Input.App, _ = res.Get("app").String()
 
 	Input.Table = c.Param("table")
 	Input.Mode = c.Param("mode")
 	Input.Auth = c.Request.Header.Get("Authorization")
+	Input.Other = other
 
 	//debug.Info("[INPUT]" + " " + string(buf))
 	if debug.GetDebug() {
@@ -74,7 +77,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 
 	if Input.Auth == "" {
 		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-		output(c, nil, errors.New("Not Authorization!"))
+		output(c, nil, errors.New("No Authorization!"))
 		return
 	}
 
@@ -127,12 +130,19 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		output(c, result, error)
 
 	case "update":
-		error := mongo.Update(app, Input.Table, where, bson.M{"$set": data})
-		output(c, data, error)
-
-	case "upsert":
-		error := mongo.Upsert(app, Input.Table, where, bson.M{"$set": data})
-		output(c, data, error)
+		error := mongo.Update(app, Input.Table, where, data, other)
+		if error != nil {
+			output(c, nil, error)
+			return
+		}
+		if other.Multi {
+			result, error := mongo.FindAll(app, Input.Table, where, other)
+			output(c, result, error)
+		} else {
+			var result bson.M
+			error = mongo.FindOne(app, Input.Table, where, other, &result)
+			output(c, result, error)
+		}
 
 	case "remove":
 		error := mongo.Remove(app, Input.Table, where)
@@ -264,7 +274,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 	if Input.Auth == "" {
 		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-		output(c, nil, errors.New("Not Authorization!"))
+		output(c, nil, fmt.Errorf("No Authorization!"))
 		return
 	}
 
@@ -276,7 +286,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 		if error != nil {
 			//debug.Error(error)
 			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			output(c, nil, errors.New("The authorization verification information does not exist. Please verify."))
+			output(c, nil, fmt.Errorf("The authorization verification information does not exist. Please verify."))
 			return
 		}
 		app = AppInfo.Id

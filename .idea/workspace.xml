@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c888842c-624e-44dc-8fa4-eda8ba9c0210" name="Default Changelist" comment="优化get方法数据解码">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/conf/conf.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/conf/conf.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/json/format.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/json/format.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/mongodb/mongodb.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/mongodb/mongodb.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/libs/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/libs/router/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
