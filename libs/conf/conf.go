@@ -28,6 +28,7 @@ type Input struct {
 
 type Other struct {
 	Page       int64    `json:"page,omitempty" form:"page,omitempty" query:"page,omitempty"`
+	Skip       int64    `json:"skip,omitempty" form:"skip,omitempty" query:"skip,omitempty"`
 	Limit      int64    `json:"limit,omitempty" form:"limit,omitempty" query:"limit,omitempty"`
 	Show       bson.M   `json:"show,omitempty" form:"show,omitempty" query:"show,omitempty"`
 	Distinct   bson.M   `json:"distinct,omitempty" form:"distinct,omitempty" query:"distinct,omitempty"`

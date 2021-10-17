@@ -42,7 +42,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 
 	other := new(conf.Other)
 
-	limit, err := res.Get("other").Get("page").Int64()
+	limit, err := res.Get("other").Get("limit").Int64()
 	if err != nil {
 		limit = 20
 	}
@@ -55,6 +55,11 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		page = 0
 	}
 	other.Page = page * limit
+	skip, err := res.Get("other").Get("skip").Int64()
+	if err != nil {
+		skip = page * limit
+	}
+	other.Skip = skip
 	other.Show = iJson.Format(res.Get("other").Get("show"))
 	other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
 	other.Sort = iJson.Format(res.Get("other").Get("sort"))

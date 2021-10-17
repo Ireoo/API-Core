@@ -131,7 +131,7 @@ func FindOne(db, collection string, query interface{}, other *conf.Other, result
 	c := connect(db, collection)
 
 	opts := options.FindOne()
-	opts.SetSkip(other.Page)
+	opts.SetSkip(other.Skip)
 	if other.Show != nil {
 		opts.SetProjection(other.Show)
 	}
@@ -143,7 +143,7 @@ func FindAll(db, collection string, query interface{}, other *conf.Other) ([]bso
 	c := connect(db, collection)
 
 	opts := options.Find()
-	opts.SetSkip(other.Page)
+	opts.SetSkip(other.Skip)
 	opts.SetLimit(other.Limit)
 	if other.SortFormat != nil {
 		opts.SetSort(other.SortFormat)
@@ -165,7 +165,7 @@ func FindPage(db, collection string, other *conf.Other, query interface{}) ([]bs
 	c := connect(db, collection)
 
 	opts := options.Find()
-	opts.SetSkip(other.Page)
+	opts.SetSkip(other.Skip)
 	opts.SetLimit(other.Limit)
 	if other.SortFormat != nil {
 		opts.SetSort(other.SortFormat)
