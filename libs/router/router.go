@@ -108,20 +108,32 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	case "once":
 		var result bson.M
 		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
+		if error != nil {
+			result = bson.M{}
+		}
+		output(c, result, nil)
 
 	case "findOne":
 		var result bson.M
 		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
+		if error != nil {
+			result = bson.M{}
+		}
+		output(c, result, nil)
 
 	case "findAll":
 		result, error := mongo.FindAll(app, Input.Table, where, other)
-		output(c, result, error)
+		if error != nil {
+			result = []bson.M{}
+		}
+		output(c, result, nil)
 
 	case "find":
 		result, error := mongo.FindPage(app, Input.Table, other, where)
-		output(c, result, error)
+		if error != nil {
+			result = []bson.M{}
+		}
+		output(c, result, nil)
 
 	case "insert":
 		insert, error := mongo.Insert(app, Input.Table, data)
@@ -309,20 +321,32 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	case "once":
 		var result bson.M
 		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
+		if error != nil {
+			result = bson.M{}
+		}
+		output(c, result, nil)
 
 	case "findOne":
 		var result bson.M
 		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
+		if error != nil {
+			result = bson.M{}
+		}
+		output(c, result, nil)
 
 	case "findAll":
 		result, error := mongo.FindAll(app, Input.Table, where, other)
-		output(c, result, error)
+		if error != nil {
+			result = []bson.M{}
+		}
+		output(c, result, nil)
 
 	case "find":
 		result, error := mongo.FindPage(app, Input.Table, other, where)
-		output(c, result, error)
+		if error != nil {
+			result = []bson.M{}
+		}
+		output(c, result, nil)
 
 	case "count":
 		count, error := mongo.Count(app, Input.Table, where)
