@@ -126,7 +126,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		if error != nil {
 			result = []bson.M{}
 		}
-		output(c, result, nil)
+		output(c, result, error)
 
 	case "find":
 		result, error := mongo.FindPage(app, Input.Table, other, where)
