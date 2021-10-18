@@ -124,7 +124,13 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	case "findAll":
 		result, error := mongo.FindAll(app, Input.Table, where, other)
 		if error != nil {
-			result = []bson.M{}
+			// if error.Error() == "mongo: " {
+			// 	result = []bson.M{}
+			// } else {
+			// 	output(c, nil, error)
+			// 	return
+			// }
+
 		}
 		output(c, result, error)
 
