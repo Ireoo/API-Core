@@ -39,7 +39,14 @@ func Table(c *gin.Context, secret string, Debug bool) {
 
 	Input.Where = iJson.Format(res.Get("where"))
 	Input.Data = iJson.Format(res.Get("data"))
-
+	and, err := res.Get("where").Get("$and").Array()
+	if err == nil {
+		Input.Where["$and"] = and
+	}
+	or, err := res.Get("where").Get("$or").Array()
+	if err == nil {
+		Input.Where["$or"] = or
+	}
 	other := new(conf.Other)
 
 	limit, err := res.Get("other").Get("limit").Int64()
@@ -102,6 +109,15 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	}
 
 	where := Input.Where
+	// where := bson.M{}
+	// var whereAnd bson.M
+	// whereAnd = Input.Where["$and"]
+	// and := bson.D{}
+	// for k, v := range whereAnd {
+	// 	and = append(and, bson.E{k, v})
+	// }
+	// where["$and"] = and
+
 	data := Input.Data
 
 	switch Input.Mode {

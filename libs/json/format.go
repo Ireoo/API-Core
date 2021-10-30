@@ -29,5 +29,6 @@ func Format(res *simplejson.Json) bson.M {
 			}
 		}
 	}
+
 	return data
 }
