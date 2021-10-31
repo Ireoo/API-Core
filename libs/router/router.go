@@ -89,7 +89,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 
 	if Input.Auth == "" {
 		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-		output(c, nil, errors.New("No Authorization!"))
+		output(c, nil, errors.New("no authorization"))
 		return
 	}
 
@@ -101,7 +101,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		if error != nil {
 			//debug.Error(error)
 			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			output(c, nil, errors.New("The authorization verification information does not exist. Please verify."))
+			output(c, nil, errors.New("the authorization verification information does not exist. please verify"))
 			return
 		}
 		app = AppInfo.Id
@@ -295,7 +295,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 	if Input.Auth == "" {
 		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
-		output(c, nil, fmt.Errorf("No Authorization!"))
+		output(c, nil, fmt.Errorf("no authorization"))
 		return
 	}
 
@@ -307,7 +307,7 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 		if error != nil {
 			//debug.Error(error)
 			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			output(c, nil, fmt.Errorf("The authorization verification information does not exist. Please verify."))
+			output(c, nil, fmt.Errorf("the authorization verification information does not exist. please verify"))
 			return
 		}
 		app = AppInfo.Id
@@ -318,8 +318,8 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 	// 处理sort
 	for k, v := range other.Sort {
-		other.SortFormat = append(other.SortFormat, primitive.E{Key:k, Value: v})
-	} 
+		other.SortFormat = append(other.SortFormat, primitive.E{Key: k, Value: v})
+	}
 
 	switch Input.Mode {
 	case "once":
