@@ -318,8 +318,8 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 
 	// 处理sort
 	for k, v := range other.Sort {
-		other.SortFormat = append(other.SortFormat, bson.E{k, v})
-	}
+		other.SortFormat = append(other.SortFormat, primitive.E{Key:k, Value: v})
+	} 
 
 	switch Input.Mode {
 	case "once":
