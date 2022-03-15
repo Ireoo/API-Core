@@ -80,6 +80,11 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	Input.Mode = c.Param("mode")
 	Input.Auth = c.Request.Header.Get("Authorization")
 	Input.Other = other
+	
+	// 处理sort
+	for k, v := range other.Sort {
+		other.SortFormat = append(other.SortFormat, primitive.E{Key: k, Value: v})
+	}
 
 	//debug.Info("[INPUT]" + " " + string(buf))
 	if debug.GetDebug() {
