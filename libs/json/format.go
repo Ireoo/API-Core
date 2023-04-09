@@ -49,17 +49,19 @@ func FormatArray(arr []interface{}) []interface{} {
 			b, err := json.Marshal(v)
 			if err != nil {
 				debug.Error("[ERROR]" + " " + color.FgDefault.Render(err))
-			}
-			value, err := simplejson.NewJson(b)
-			if err != nil {
-				debug.Error("[ERROR]" + " " + color.FgDefault.Render(err))
-			}
-			if innerArr, err := value.Array(); err == nil {
-				value := FormatArray(innerArr)
-				result = append(result, value)
 			} else {
-				value := Format(value)
-				result = append(result, value)
+				value, err := simplejson.NewJson(b)
+				if err != nil {
+					debug.Error("[ERROR]" + " " + color.FgDefault.Render(err))
+				} else {
+					if innerArr, err := value.Array(); err == nil {
+						value := FormatArray(innerArr)
+						result = append(result, value)
+					} else {
+						value := Format(value)
+						result = append(result, value)
+					}
+				}
 			}
 		} else {
 			result = append(result, v)
