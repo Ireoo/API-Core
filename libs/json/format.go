@@ -43,9 +43,15 @@ func FormatArray(arr []interface{}) []interface{} {
 	for _, v := range arr {
 		_type := reflect.TypeOf(v)
 		if _type.Kind() == reflect.Interface || _type.Kind() == reflect.Map {
-			if innerArr, err := simplejson.NewJson(v).Array(); err == nil {
-				value := FormatArray(innerArr)
-				result = append(result, value)
+			if b, err := json.Marshal(v); err == nil {
+				value, _ := simplejson.NewJson(b)
+				if innerArr, err := value.Array(); err == nil {
+					value := FormatArray(innerArr)
+					result = append(result, value)
+				} else {
+					value := Format(value)
+					result = append(result, value)
+				}
 			} else {
 				value := Format(simplejson.NewFromAny(v))
 				result = append(result, value)
