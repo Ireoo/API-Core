@@ -2,6 +2,7 @@ package iJson
 
 import (
 	"reflect"
+	"encoding/json"
 
 	simplejson "github.com/bitly/go-simplejson"
 	"go.mongodb.org/mongo-driver/bson"
@@ -53,7 +54,7 @@ func FormatArray(arr []interface{}) []interface{} {
 					result = append(result, value)
 				}
 			} else {
-				value := Format(simplejson.NewFromAny(v))
+				value := Format(simplejson.NewFromInterface(v))
 				result = append(result, value)
 			}
 		} else {
