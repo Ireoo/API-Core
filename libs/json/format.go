@@ -7,6 +7,7 @@ import (
 	simplejson "github.com/bitly/go-simplejson"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/Ireoo/API-Core/libs/debug"
 )
 
 func Format(res *simplejson.Json) bson.M {
@@ -46,11 +47,11 @@ func FormatArray(arr []interface{}) []interface{} {
 		if _type.Kind() == reflect.Interface || _type.Kind() == reflect.Map {
 			b, err := json.Marshal(v)
 			if err != nil {
-				// handle error
+				debug.Error("[ERROR]" + " " + color.FgDefault.Render(err))
 			}
 			value, err := simplejson.NewJson(b)
 			if err != nil {
-				// handle error
+				debug.Error("[ERROR]" + " " + color.FgDefault.Render(err))
 			}
 			if innerArr, err := value.Array(); err == nil {
 				value := FormatArray(innerArr)
