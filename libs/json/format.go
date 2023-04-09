@@ -54,7 +54,7 @@ func FormatArray(arr []interface{}) []interface{} {
 					result = append(result, value)
 				}
 			} else {
-				value := Format(simplejson.NewFromInterface(v))
+				value := Format(simplejson.NewJson(v))
 				result = append(result, value)
 			}
 		} else {
