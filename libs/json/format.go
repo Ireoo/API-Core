@@ -14,8 +14,13 @@ func Format(res *simplejson.Json) bson.M {
 	for k, v := range r {
 		_type := reflect.TypeOf(v)
 		if _type.Name() == "" {
-			value := Format(res.Get(k))
-			data[k] = value
+			if arr, ok := res.Get(k).Array(); ok {
+				value := FormatArray(arr)
+				data[k] = value
+			} else {
+				value := Format(res.Get(k))
+				data[k] = value
+			}
 		} else {
 			if k == "_id" && _type.Name() == "string" {
 				objID, err := primitive.ObjectIDFromHex(v.(string))
@@ -31,4 +36,23 @@ func Format(res *simplejson.Json) bson.M {
 	}
 
 	return data
+}
+
+func FormatArray(arr []*simplejson.Json) []interface{} {
+	result := []interface{}{}
+	for _, v := range arr {
+		_type := reflect.TypeOf(v)
+		if _type.Name() == "" {
+			if innerArr, ok := v.Array(); ok {
+				value := FormatArray(innerArr)
+				result = append(result, value)
+			} else {
+				value := Format(v)
+				result = append(result, value)
+			}
+		} else {
+			result = append(result, v.Interface())
+		}
+	}
+	return result
 }
