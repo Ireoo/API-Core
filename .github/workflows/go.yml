@@ -61,4 +61,4 @@ jobs:
           files: bin/*
           prerelease: true
           name: "Test $(date +'%Y.%m.%d')"
-          tags: "test-$(date +'%Y.%m.%d')"
+          tag: "t$(date +'%Y.%m.%d')"
