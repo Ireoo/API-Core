@@ -5,36 +5,34 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gookit/color"
+	"io"
 	"net/url"
-
-	iJson "github.com/Ireoo/API-Core/libs/json"
-
-	"net/http"
 
 	"github.com/Ireoo/API-Core/libs/conf"
 	"github.com/Ireoo/API-Core/libs/debug"
+	iJson "github.com/Ireoo/API-Core/libs/json"
 	mongo "github.com/Ireoo/API-Core/libs/mongodb"
+	simpleJson "github.com/bitly/go-simplejson"
 	"github.com/gin-gonic/gin"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-
-	simpleJson "github.com/bitly/go-simplejson"
+	"net/http"
 )
 
-func Table(c *gin.Context, secret string, Debug bool) {
-
-	debug.SetDebug(Debug)
-
+func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 	Input := new(conf.Input)
-
 	buf := make([]byte, c.Request.ContentLength)
-	_, _ = c.Request.Body.Read(buf)
+	if c.Request.Body == nil {
+		return nil, nil, errors.New("request body is nil")
+	}
+	_, err := c.Request.Body.Read(buf)
+	if err != nil && err != io.EOF {
+		return nil, nil, err
+	}
 
 	res, err := simpleJson.NewJson(buf)
 	if err != nil {
-		fmt.Printf("%v\n", err)
-		return
+		return nil, nil, err
 	}
 
 	Input.Where = iJson.Format(res.Get("where"))
@@ -50,10 +48,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	other := new(conf.Other)
 
 	limit, err := res.Get("other").Get("limit").Int64()
-	if err != nil {
-		limit = 20
-	}
-	if limit == 0 {
+	if err != nil || limit == 0 {
 		limit = 20
 	}
 	other.Limit = limit
@@ -62,11 +57,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		page = 0
 	}
 	other.Page = page * limit
-	skip, err := res.Get("other").Get("skip").Int64()
-	if err != nil {
-		skip = page * limit
-	}
-	other.Skip = skip
+	// skip := page * limit // <- 删除未使用的变量
 	other.Show = iJson.Format(res.Get("other").Get("show"))
 	other.Distinct = iJson.Format(res.Get("other").Get("distinct"))
 	other.Sort = iJson.Format(res.Get("other").Get("sort"))
@@ -75,113 +66,108 @@ func Table(c *gin.Context, secret string, Debug bool) {
 	other.Multi, _ = res.Get("other").Get("multi").Bool()
 
 	Input.App, _ = res.Get("app").String()
-
 	Input.Table = c.Param("table")
 	Input.Mode = c.Param("mode")
 	Input.Auth = c.Request.Header.Get("Authorization")
 	Input.Other = other
-	
-	// 处理sort
-	for k, v := range other.Sort {
-		other.SortFormat = append(other.SortFormat, primitive.E{Key: k, Value: v})
+
+	return Input, other, nil
+}
+
+func handleAuth(Input *conf.Input, secret string, other *conf.Other) (string, string, error) {
+	app := "api"
+	user := ""
+	if Input.Auth != secret {
+		AppInfo := new(conf.AppInfo)
+		err := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
+		if err != nil {
+			return "", "", errors.New("the authorization verification information does not exist. please verify")
+		}
+		app = AppInfo.Id
+		user = AppInfo.Uuid
+	}
+	return app, user, nil
+}
+
+func Table(c *gin.Context, secret string, Debug bool) {
+	debug.SetDebug(Debug)
+
+	Input, other, err := parseInput(c)
+	if err != nil {
+		output(c, nil, err)
+		return
 	}
 
-	//debug.Info("[INPUT]" + " " + string(buf))
 	if debug.GetDebug() {
 		jsonStr, _ := json.Marshal(Input)
 		debug.Info("[INPUT]" + " " + string(jsonStr))
 	}
 
 	if Input.Auth == "" {
-		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
 		output(c, nil, errors.New("no authorization"))
 		return
 	}
 
-	app := "api"
-	user := ""
-	if Input.Auth != secret {
-		AppInfo := new(conf.AppInfo)
-		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
-		if error != nil {
-			//debug.Error(error)
-			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			output(c, nil, errors.New("the authorization verification information does not exist. please verify"))
-			return
-		}
-		app = AppInfo.Id
-		user = AppInfo.Uuid
+	app, user, err := handleAuth(Input, secret, other)
+	if err != nil {
+		output(c, nil, err)
+		return
 	}
 
 	where := Input.Where
-	// where := bson.M{}
-	// var whereAnd bson.M
-	// whereAnd = Input.Where["$and"]
-	// and := bson.D{}
-	// for k, v := range whereAnd {
-	// 	and = append(and, bson.E{k, v})
-	// }
-	// where["$and"] = and
-
 	data := Input.Data
 
 	switch Input.Mode {
-	case "once":
+	case "once", "findOne":
 		var result bson.M
-		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
-
-	case "findOne":
-		var result bson.M
-		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
+		err := mongo.FindOne(app, Input.Table, where, other, &result)
+		output(c, result, err)
 
 	case "findAll":
-		result, error := mongo.FindAll(app, Input.Table, where, other)
-		output(c, result, error)
+		result, err := mongo.FindAll(app, Input.Table, where, other)
+		output(c, result, err)
 
 	case "find":
-		result, error := mongo.FindPage(app, Input.Table, other, where)
-		output(c, result, error)
+		result, err := mongo.FindPage(app, Input.Table, other, where)
+		output(c, result, err)
 
 	case "insert":
-		insert, error := mongo.Insert(app, Input.Table, data)
-		if error != nil {
-			output(c, nil, error)
+		insert, err := mongo.Insert(app, Input.Table, data)
+		if err != nil {
+			output(c, nil, err)
 			return
 		}
 		var result bson.M
 		debug.Info(bson.M{"_id": insert.InsertedID})
-		error = mongo.FindOne(app, Input.Table, bson.M{"_id": insert.InsertedID}, other, &result)
-		output(c, result, error)
+		err = mongo.FindOne(app, Input.Table, bson.M{"_id": insert.InsertedID}, other, &result)
+		output(c, result, err)
 
 	case "update":
-		error := mongo.Update(app, Input.Table, where, data, other)
-		if error != nil {
-			output(c, nil, error)
+		err := mongo.Update(app, Input.Table, where, data, other)
+		if err != nil {
+			output(c, nil, err)
 			return
 		}
 		if other.Multi {
-			result, error := mongo.FindAll(app, Input.Table, where, other)
-			output(c, result, error)
+			result, err := mongo.FindAll(app, Input.Table, where, other)
+			output(c, result, err)
 		} else {
 			var result bson.M
-			error = mongo.FindOne(app, Input.Table, where, other, &result)
-			output(c, result, error)
+			err = mongo.FindOne(app, Input.Table, where, other, &result)
+			output(c, result, err)
 		}
 
 	case "remove":
-		error := mongo.Remove(app, Input.Table, where)
-		output(c, where, error)
+		err := mongo.Remove(app, Input.Table, where)
+		output(c, where, err)
 
 	case "removeAll":
-		error := mongo.RemoveAll(app, Input.Table, where)
-		output(c, where, error)
+		err := mongo.RemoveAll(app, Input.Table, where)
+		output(c, where, err)
 
 	case "count":
-		count, error := mongo.Count(app, Input.Table, where)
-		output(c, count, error)
-		// return c.String(http.StatusOK, strconv.Itoa(int(count)))
+		count, err := mongo.Count(app, Input.Table, where)
+		output(c, count, err)
 
 	case "isEmpty":
 		var r string
@@ -205,7 +191,7 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		r := mongo.Indexes(app, Input.Table)
 		output(c, r, nil)
 
-	case "listCollections":
+	case "listCollections", "drop":
 		if Input.App == "" {
 			output(c, nil, errors.New("no app id"))
 			return
@@ -216,50 +202,27 @@ func Table(c *gin.Context, secret string, Debug bool) {
 		}
 
 		appInfo := new(conf.AppInfo)
-		_id, error := primitive.ObjectIDFromHex(_app)
-		if error != nil {
-			output(c, nil, error)
+		_id, err := primitive.ObjectIDFromHex(_app)
+		if err != nil {
+			output(c, nil, err)
 			return
 		}
-		error = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
-		if error != nil {
-			output(c, nil, error)
-			return
-		}
-		if appInfo.Uuid != user {
-			output(c, nil, errors.New("unauthorized operation"))
-			return
-		}
-		result, error := mongo.CollectionNames(_app)
-		output(c, result, error)
-
-	case "drop":
-		if Input.App == "" {
-			output(c, nil, errors.New("no app id"))
-			return
-		}
-		_app := app
-		if _app == "api" {
-			_app = Input.App
-		}
-
-		appInfo := new(conf.AppInfo)
-		_id, error := primitive.ObjectIDFromHex(_app)
-		if error != nil {
-			output(c, nil, error)
-			return
-		}
-		error = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
-		if error != nil {
-			output(c, nil, error)
+		err = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
+		if err != nil {
+			output(c, nil, err)
 			return
 		}
 		if appInfo.Uuid != user {
 			output(c, nil, errors.New("unauthorized operation"))
 			return
 		}
-		err := mongo.DropDatabase(_app)
-		output(c, nil, err)
+		if Input.Mode == "listCollections" {
+			result, err := mongo.CollectionNames(_app)
+			output(c, result, err)
+		} else {
+			err := mongo.DropDatabase(_app)
+			output(c, nil, err)
+		}
 
 	default:
 		output(c, nil, fmt.Errorf("operating mode in existence: %v", Input.Mode))
@@ -267,7 +230,6 @@ func Table(c *gin.Context, secret string, Debug bool) {
 }
 
 func TableGet(c *gin.Context, secret string, Debug bool) {
-
 	debug.SetDebug(Debug)
 
 	Input := new(conf.Input)
@@ -282,7 +244,6 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.Data)
 	decoded, _ = url.QueryUnescape(c.Query("other"))
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &other)
-	//fmt.Println(other.Sort["speedtest"])
 	decoded, _ = url.QueryUnescape(c.Query("app"))
 	_ = bson.UnmarshalExtJSON([]byte(decoded), true, &Input.App)
 	decoded, _ = url.QueryUnescape(c.Query("auth"))
@@ -299,56 +260,35 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 	}
 
 	if Input.Auth == "" {
-		//c.String(http.StatusNonAuthoritativeInfo, "Not Authorization!")
 		output(c, nil, fmt.Errorf("no authorization"))
 		return
 	}
 
-	app := "api"
-	user := ""
-	if Input.Auth != secret {
-		AppInfo := new(conf.AppInfo)
-		error := mongo.FindOne(app, "apps", bson.M{"secret": Input.Auth}, other, &AppInfo)
-		if error != nil {
-			//debug.Error(error)
-			//c.String(http.StatusNonAuthoritativeInfo, "The authorization verification information does not exist. Please verify.")
-			output(c, nil, fmt.Errorf("the authorization verification information does not exist. please verify"))
-			return
-		}
-		app = AppInfo.Id
-		user = AppInfo.Uuid
+	app, user, err := handleAuth(Input, secret, other)
+	if err != nil {
+		output(c, nil, err)
+		return
 	}
 
 	where := Input.Where
 
-	// 处理sort
-	for k, v := range other.Sort {
-		other.SortFormat = append(other.SortFormat, primitive.E{Key: k, Value: v})
-	}
-
 	switch Input.Mode {
-	case "once":
+	case "once", "findOne":
 		var result bson.M
-		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
-
-	case "findOne":
-		var result bson.M
-		error := mongo.FindOne(app, Input.Table, where, other, &result)
-		output(c, result, error)
+		err := mongo.FindOne(app, Input.Table, where, other, &result)
+		output(c, result, err)
 
 	case "findAll":
-		result, error := mongo.FindAll(app, Input.Table, where, other)
-		output(c, result, error)
+		result, err := mongo.FindAll(app, Input.Table, where, other)
+		output(c, result, err)
 
 	case "find":
-		result, error := mongo.FindPage(app, Input.Table, other, where)
-		output(c, result, error)
+		result, err := mongo.FindPage(app, Input.Table, other, where)
+		output(c, result, err)
 
 	case "count":
-		count, error := mongo.Count(app, Input.Table, where)
-		output(c, count, error)
-		// return c.String(http.StatusOK, strconv.Itoa(int(count)))
+		count, err := mongo.Count(app, Input.Table, where)
+		output(c, count, err)
 
 	case "isEmpty":
 		var r string
@@ -374,22 +314,22 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 		}
 
 		appInfo := new(conf.AppInfo)
-		_id, error := primitive.ObjectIDFromHex(_app)
-		if error != nil {
-			output(c, nil, error)
+		_id, err := primitive.ObjectIDFromHex(_app)
+		if err != nil {
+			output(c, nil, err)
 			return
 		}
-		error = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
-		if error != nil {
-			output(c, nil, error)
+		err = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
+		if err != nil {
+			output(c, nil, err)
 			return
 		}
 		if appInfo.Uuid != user {
 			output(c, nil, errors.New("unauthorized operation"))
 			return
 		}
-		result, error := mongo.CollectionNames(_app)
-		output(c, result, error)
+		result, err := mongo.CollectionNames(_app)
+		output(c, result, err)
 
 	default:
 		output(c, nil, fmt.Errorf("operating mode in existence: %v", Input.Mode))
