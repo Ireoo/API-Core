@@ -47,6 +47,11 @@ jobs:
           files: bin/*
           draft: true
 
+      - name: Set Prerelease Tag
+        if: ${{ github.ref != 'refs/tags/' }}
+        id: prerelease_tag
+        run: echo "::set-output name=tag::t$(date +'%Y.%m.%d')"
+
       - name: Build Prerelease
         if: ${{ github.ref != 'refs/tags/' }}
         env:
@@ -60,5 +65,5 @@ jobs:
         with:
           files: bin/*
           prerelease: true
-          name: "Test $(date +'%Y.%m.%d')"
-          tag_name: "t$(date +'%Y.%m.%d')"
+          name: "Test ${{ steps.prerelease_tag.outputs.tag }}"
+          tag_name: ${{ steps.prerelease_tag.outputs.tag }}
