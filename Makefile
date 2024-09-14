@@ -1,6 +1,6 @@
 NAME=API-Core
 BINDIR=bin
-VERSION=$(shell git describe --tags || echo "unknown version")
+VERSION=$(shell git describe --tags 2>/dev/null || echo "t$(shell date +'%Y.%m.%d')")
 BUILDTIME=$(shell date -u)
 GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-X "github.com/Ireoo/API-Core/info.Version=$(VERSION)" \
 		-X "github.com/Ireoo/API-Core/info.BuildTime=$(BUILDTIME)" \
