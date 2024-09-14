@@ -46,19 +46,3 @@ jobs:
         with:
           files: bin/*
           draft: true
-
-      - name: Build Prerelease
-        if: ${{ github.ref != 'refs/tags/' }}
-        env:
-          NAME: api-core
-          BINDIR: bin
-        run: make -j4 releases --debug=v
-
-      - name: Upload Prerelease
-        uses: softprops/action-gh-release@v1
-        if: ${{ github.ref != 'refs/tags/' }}
-        with:
-          files: bin/*
-          prerelease: true
-          name: "Test $(date +'%Y.%m.%d:%H.%M.%S')"
-          tags: "test-$(date +'%Y.%m.%d:%H.%M.%S')"
