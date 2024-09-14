@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -28,7 +27,7 @@ var (
 func New(command_uri string) error {
 	exist, _ := basic.PathExists("./api-core.conf")
 	if !exist {
-		_ = ioutil.WriteFile("./api-core.conf", []byte(`# This is a api-core config file.
+		_ = os.WriteFile("./api-core.conf", []byte(`# This is a api-core config file.
 # This is demo.
 
 Host: "127.0.0.1:27017"
@@ -45,7 +44,7 @@ PoolLimit: 4096
 	}
 
 	config := new(conf.MongoDB)
-	configYaml, err := ioutil.ReadFile("./api-core.conf")
+	configYaml, err := os.ReadFile("./api-core.conf")
 	if err != nil {
 		log.Fatalf("ReadFile: %v", err)
 	}
