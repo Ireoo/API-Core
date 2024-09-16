@@ -17,13 +17,13 @@ type MongoDB struct {
 }
 
 type Input struct {
-	Where bson.M `json:"where,omitempty" form:"where,omitempty" query:"where,omitempty"` // 修改类型为 interface{}
-	Data  bson.M `json:"data,omitempty" form:"data,omitempty" query:"data,omitempty"`
-	Other *Other `json:"other,omitempty" form:"other,omitempty" query:"other,omitempty"` // 修改类型为 *Other
-	Table string `json:"table,omitempty" form:"table,omitempty" query:"table,omitempty"`
-	Mode  string `json:"mode,omitempty" form:"mode,omitempty" query:"mode,omitempty"`
-	Auth  string `json:"auth,omitempty" form:"auth,omitempty" query:"auth,omitempty"`
-	App   string `json:"app,omitempty" form:"app,omitempty" query:"app,omitempty"`
+	Where interface{} `json:"where,omitempty" form:"where,omitempty" query:"where,omitempty"` // 修改类型为 interface{}
+	Data  bson.M      `json:"data,omitempty" form:"data,omitempty" query:"data,omitempty"`
+	Other *Other      `json:"other,omitempty" form:"other,omitempty" query:"other,omitempty"` // 修改类型为 *Other
+	Table string      `json:"table,omitempty" form:"table,omitempty" query:"table,omitempty"`
+	Mode  string      `json:"mode,omitempty" form:"mode,omitempty" query:"mode,omitempty"`
+	Auth  string      `json:"auth,omitempty" form:"auth,omitempty" query:"auth,omitempty"`
+	App   string      `json:"app,omitempty" form:"app,omitempty" query:"app,omitempty"`
 }
 
 type Other struct {
