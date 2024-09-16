@@ -35,33 +35,16 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 		return nil, nil, err
 	}
 
-	fmt.Println("res.Get(\"where\")", res.Get("where"))
 	Input.Where = iJson.Format(res.Get("where"))
 	Input.Data = iJson.Format(res.Get("data"))
-	if andArray, err := res.Get("where").Get("$and").Array(); err == nil {
-		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
-			whereMap["$and"] = andArray
-			Input.Where = whereMap
-		}
+	and, err := res.Get("where").Get("$and").Array()
+	if err == nil {
+		Input.Where["$and"] = and
 	}
-	if orArray, err := res.Get("where").Get("$or").Array(); err == nil {
-		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
-			whereMap["$or"] = orArray
-			Input.Where = whereMap
-		}
+	or, err := res.Get("where").Get("$or").Array()
+	if err == nil {
+		Input.Where["$or"] = or
 	}
-
-	// 添加类型检查和转换
-	if whereMap, ok := Input.Where.(map[string]interface{}); ok {
-		// 处理 json.Number 类型
-		for key, value := range whereMap {
-			if num, ok := value.(json.Number); ok {
-				whereMap[key] = num.String()
-			}
-		}
-		Input.Where = whereMap
-	}
-
 	other := new(conf.Other)
 
 	limit, err := res.Get("other").Get("limit").Int64()
