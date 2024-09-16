@@ -75,12 +75,22 @@ func main() {
 	router.Use(cors.New(corsConf))
 
 	// 设置静态文件
-	router.StaticFS("/static/css", http.Dir("./static/static/css"))
-	router.StaticFS("/static/js", http.Dir("./static/static/js"))
-	router.StaticFS("/static/fonts", http.Dir("./static/static/fonts"))
-	router.StaticFile("/", "./static/index.html")
-	router.StaticFile("/admin", "./static/admin.html")
-	router.StaticFile("/favicon.ico", "./static/favicon.ico")
+	staticFiles := map[string]string{
+		"/static/css":   "./static/static/css",
+		"/static/js":    "./static/static/js",
+		"/static/fonts": "./static/static/fonts",
+		"/":             "./static/index.html",
+		"/admin":        "./static/admin.html",
+		"/favicon.ico":  "./static/favicon.ico",
+	}
+
+	for route, path := range staticFiles {
+		if route == "/" || route == "/admin" || route == "/favicon.ico" {
+			router.StaticFile(route, path)
+		} else {
+			router.StaticFS(route, http.Dir(path))
+		}
+	}
 
 	// 程序核心部分
 	router.POST("/:table/:mode", func(c *gin.Context) {

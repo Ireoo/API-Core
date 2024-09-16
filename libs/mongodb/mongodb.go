@@ -10,13 +10,11 @@ import (
 	"github.com/Ireoo/API-Core/libs/basic"
 	"github.com/Ireoo/API-Core/libs/conf"
 
-	// "github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"gopkg.in/yaml.v2"
-	// "testing" // Remove this line
 )
 
 var (
@@ -55,16 +53,9 @@ PoolLimit: 4096
 	}
 
 	if config.Host != "" {
-		// log.Printf(`Got config: HOST: %q`, config.Host)
-		// log.Printf(`Got config: AUTH: %q`, config.Auth)
-		// log.Printf(`Got config: USERNAME: %q`, config.Username)
-		// log.Printf(`Got config: PASSWORD: %q`, config.Password)
-		// log.Printf(`Got config: TIMEOUT: %s`, config.Timeout*time.Millisecond)
-		// log.Printf(`Got config: POOLLIMIT: %d`, config.PoolLimit)
 		uri = "mongodb://" + config.Username + ":" + config.Password + "@" + config.Host + "/" + config.Auth
 	}
 	if config.URI != "" {
-		// log.Printf(`Got config: URI: %s`, config.URI)
 		uri = config.URI
 	}
 	if os.Getenv("MONGODB_URI") != "" {
@@ -80,7 +71,7 @@ PoolLimit: 4096
 		log.Printf(`Got MongoDB Connect URI: %s`, uri)
 	}
 
-	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
 		log.Fatalf("Create Session: %s\n", err)
 	}
@@ -91,24 +82,17 @@ PoolLimit: 4096
 	if err != nil {
 		log.Fatalf("Create Session: %s\n", err)
 	}
-	// defer func() {
-	// 	if err := client.Disconnect(context.TODO()); err != nil {
-	// 		log.Fatalf("Create Session: %s\n", err)
-	// 	}
-	// }()
 	return err
 }
 
 func connect(db, collection string) *mongo.Collection {
-
-	c := client.Database(db).Collection(collection)
-	return c
+	return client.Database(db).Collection(collection)
 }
 
 func IsEmpty(db, collection string) bool {
 	c := connect(db, collection)
 
-	count, err := c.EstimatedDocumentCount(context.TODO())
+	count, err := c.EstimatedDocumentCount(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -118,13 +102,13 @@ func IsEmpty(db, collection string) bool {
 func Count(db, collection string, query interface{}) (int64, error) {
 	c := connect(db, collection)
 
-	return c.CountDocuments(context.TODO(), query)
+	return c.CountDocuments(context.Background(), query)
 }
 
 func Insert(db, collection string, doc interface{}) (*mongo.InsertOneResult, error) {
 	c := connect(db, collection)
 
-	return c.InsertOne(context.TODO(), doc)
+	return c.InsertOne(context.Background(), doc)
 }
 
 func FindOne(db, collection string, query interface{}, other *conf.Other, result interface{}) error {
@@ -136,7 +120,7 @@ func FindOne(db, collection string, query interface{}, other *conf.Other, result
 		opts.SetProjection(other.Show)
 	}
 
-	return c.FindOne(context.TODO(), query, opts).Decode(result)
+	return c.FindOne(context.Background(), query, opts).Decode(result)
 }
 
 func FindAll(db, collection string, query interface{}, other *conf.Other) ([]bson.M, error) {
@@ -152,13 +136,15 @@ func FindAll(db, collection string, query interface{}, other *conf.Other) ([]bso
 		opts.SetProjection(other.Show)
 	}
 
-	Cursor, err := c.Find(context.TODO(), query, opts)
+	Cursor, err := c.Find(context.Background(), query, opts)
 	if err != nil {
-		return []bson.M{}, err
+		return nil, err
 	}
 	var result []bson.M
-	err = Cursor.All(context.TODO(), &result)
-	return result, err
+	if err = Cursor.All(context.Background(), &result); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func FindPage(db, collection string, other *conf.Other, query interface{}) ([]bson.M, error) {
@@ -174,13 +160,15 @@ func FindPage(db, collection string, other *conf.Other, query interface{}) ([]bs
 		opts.SetProjection(other.Show)
 	}
 
-	Cursor, err := c.Find(context.TODO(), query, opts)
+	Cursor, err := c.Find(context.Background(), query, opts)
 	if err != nil {
-		return []bson.M{}, err
+		return nil, err
 	}
 	var result []bson.M
-	err = Cursor.All(context.TODO(), &result)
-	return result, err
+	if err = Cursor.All(context.Background(), &result); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func Update(db, collection string, where, update interface{}, other *conf.Other) error {
@@ -189,10 +177,10 @@ func Update(db, collection string, where, update interface{}, other *conf.Other)
 	opts := options.Update()
 	opts.SetUpsert(other.Upsert)
 	if other.Multi {
-		_, err := c.UpdateMany(context.TODO(), where, update, opts)
+		_, err := c.UpdateMany(context.Background(), where, update, opts)
 		return err
 	} else {
-		_, err := c.UpdateOne(context.TODO(), where, update, opts)
+		_, err := c.UpdateOne(context.Background(), where, update, opts)
 		return err
 	}
 }
@@ -200,14 +188,14 @@ func Update(db, collection string, where, update interface{}, other *conf.Other)
 func Remove(db, collection string, selector interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.DeleteOne(context.TODO(), selector)
+	_, err := c.DeleteOne(context.Background(), selector)
 	return err
 }
 
 func RemoveAll(db, collection string, selector interface{}) error {
 	c := connect(db, collection)
 
-	_, err := c.DeleteMany(context.TODO(), selector)
+	_, err := c.DeleteMany(context.Background(), selector)
 	return err
 }
 
@@ -218,45 +206,32 @@ func EnsureIndex(db, collection string, selector []string) error {
 		Keys:    selector,
 		Options: options.Index().SetUnique(true),
 	}
-	_, err := c.Indexes().CreateOne(context.TODO(), index)
+	_, err := c.Indexes().CreateOne(context.Background(), index)
 	return err
 }
 
 func Indexes(db, collection string) []bson.M {
 	c := connect(db, collection)
 
-	cur, _ := c.Indexes().List(context.TODO())
+	cur, _ := c.Indexes().List(context.Background())
 	var result []bson.M
-	_ = cur.All(context.TODO(), &result)
+	_ = cur.All(context.Background(), &result)
 	return result
 }
 
-/**
- * 数据库操作
- */
-
 func connectDB(db string) *mongo.Database {
-	d := client.Database(db)
-	return d
+	return client.Database(db)
 }
 
 func CollectionNames(db string) ([]string, error) {
 	d := connectDB(db)
 
 	opts := options.ListCollections()
-	return d.ListCollectionNames(context.TODO(), bson.M{}, opts) //.CollectionNames()
+	return d.ListCollectionNames(context.Background(), bson.M{}, opts)
 }
-
-// func AddUser(db string, username string, password string, readOnly bool) error {
-// 	d := connectDB(db)
-
-// 	err := d //.AddUser(username, password, readOnly)
-// 	return err
-// }
 
 func DropDatabase(db string) error {
 	d := connectDB(db)
 
-	err := d.Drop(context.TODO()) //.DropDatabase()
-	return err
+	return d.Drop(context.Background())
 }

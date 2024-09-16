@@ -37,14 +37,19 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 
 	Input.Where = iJson.Format(res.Get("where"))
 	Input.Data = iJson.Format(res.Get("data"))
-	and, err := res.Get("where").Get("$and").Array()
-	if err == nil {
-		Input.Where["$and"] = and
+	if andArray, err := res.Get("where").Get("$and").Array(); err == nil {
+		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
+			whereMap["$and"] = andArray
+			Input.Where = whereMap
+		}
 	}
-	or, err := res.Get("where").Get("$or").Array()
-	if err == nil {
-		Input.Where["$or"] = or
+	if orArray, err := res.Get("where").Get("$or").Array(); err == nil {
+		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
+			whereMap["$or"] = orArray
+			Input.Where = whereMap
+		}
 	}
+
 	other := new(conf.Other)
 
 	limit, err := res.Get("other").Get("limit").Int64()
