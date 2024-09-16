@@ -25,7 +25,7 @@ func Format(res *simplejson.Json) bson.M {
 				data[k] = value
 			}
 		} else {
-			if k == "_id" {
+			if k == "_id" || k == "uuid" { // 添加对 uuid 字段的处理
 				switch val := v.(type) {
 				case string:
 					objID, err := primitive.ObjectIDFromHex(val)
