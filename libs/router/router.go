@@ -51,6 +51,17 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 		}
 	}
 
+	// 添加类型检查和转换
+	if whereMap, ok := Input.Where.(map[string]interface{}); ok {
+		// 处理 json.Number 类型
+		for key, value := range whereMap {
+			if num, ok := value.(json.Number); ok {
+				whereMap[key] = num.String()
+			}
+		}
+		Input.Where = whereMap
+	}
+
 	other := new(conf.Other)
 
 	limit, err := res.Get("other").Get("limit").Int64()
