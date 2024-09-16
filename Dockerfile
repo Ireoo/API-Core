@@ -8,7 +8,7 @@ WORKDIR /app
 # RUN ls -alF
 RUN mv ./dist /dist
 
-FROM golang:alpine as builder
+FROM golang:1.23.1-alpine as builder
 
 RUN apk add --no-cache make git
 WORKDIR /api-core-src
