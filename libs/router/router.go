@@ -37,32 +37,14 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 
 	Input.Where = iJson.Format(res.Get("where"))
 	Input.Data = iJson.Format(res.Get("data"))
-
-	// 处理 json.Number 类型
-	Input.Where = convertJsonNumber(Input.Where).(primitive.M)
-	Input.Data = convertJsonNumber(Input.Data).(primitive.M)
-
-	if andArray, err := res.Get("where").Get("$and").Array(); err == nil {
-		if whereMap, ok := Input.Where.(primitive.M); ok {
-			whereMap["$and"] = convertJsonNumber(andArray).([]interface{})
-			Input.Where = whereMap
-		}
-	}
-	if orArray, err := res.Get("where").Get("$or").Array(); err == nil {
-		if whereMap, ok := Input.Where.(primitive.M); ok {
-			whereMap["$or"] = convertJsonNumber(orArray).([]interface{})
-			Input.Where = whereMap
-		}
-	}
-
-	// 确保 where 字段中的数据被正确解析
-	if whereMap, ok := Input.Where.(primitive.M); ok {
-		for key, value := range whereMap {
-			whereMap[key] = convertJsonNumber(value)
-		}
-		Input.Where = whereMap
-	}
-
+	// and, err := res.Get("where").Get("$and").Array()
+	// if err == nil {
+	// 	Input.Where["$and"] = and
+	// }
+	// or, err := res.Get("where").Get("$or").Array()
+	// if err == nil {
+	// 	Input.Where["$or"] = or
+	// }
 	other := new(conf.Other)
 
 	limit, err := res.Get("other").Get("limit").Int64()
@@ -90,27 +72,6 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 	Input.Other = other
 
 	return Input, other, nil
-}
-
-func convertJsonNumber(data interface{}) interface{} {
-	switch v := data.(type) {
-	case map[string]interface{}:
-		for key, value := range v {
-			v[key] = convertJsonNumber(value)
-		}
-	case []interface{}:
-		for i, value := range v {
-			v[i] = convertJsonNumber(value)
-		}
-	case json.Number:
-		if intVal, err := v.Int64(); err == nil {
-			return intVal
-		}
-		if floatVal, err := v.Float64(); err == nil {
-			return floatVal
-		}
-	}
-	return data
 }
 
 func handleAuth(Input *conf.Input, secret string, other *conf.Other) (string, string, error) {
@@ -361,6 +322,10 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 		err = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
 		if err != nil {
 			output(c, nil, err)
+			return
+		}
+		if appInfo.Uuid != user {
+			output(c, nil, errors.New("unauthorized operation"))
 			return
 		}
 		result, err := mongo.CollectionNames(_app)
