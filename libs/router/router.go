@@ -43,16 +43,24 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 	Input.Data = convertJsonNumber(Input.Data).(primitive.M)
 
 	if andArray, err := res.Get("where").Get("$and").Array(); err == nil {
-		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
-			whereMap["$and"] = andArray
+		if whereMap, ok := Input.Where.(primitive.M); ok {
+			whereMap["$and"] = convertJsonNumber(andArray).([]interface{})
 			Input.Where = whereMap
 		}
 	}
 	if orArray, err := res.Get("where").Get("$or").Array(); err == nil {
-		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
-			whereMap["$or"] = orArray
+		if whereMap, ok := Input.Where.(primitive.M); ok {
+			whereMap["$or"] = convertJsonNumber(orArray).([]interface{})
 			Input.Where = whereMap
 		}
+	}
+
+	// 确保 where 字段中的数据被正确解析
+	if whereMap, ok := Input.Where.(primitive.M); ok {
+		for key, value := range whereMap {
+			whereMap[key] = convertJsonNumber(value)
+		}
+		Input.Where = whereMap
 	}
 
 	other := new(conf.Other)
@@ -353,10 +361,6 @@ func TableGet(c *gin.Context, secret string, Debug bool) {
 		err = mongo.FindOne(app, "users", bson.M{"_id": _id}, other, &appInfo)
 		if err != nil {
 			output(c, nil, err)
-			return
-		}
-		if appInfo.Uuid != user {
-			output(c, nil, errors.New("unauthorized operation"))
 			return
 		}
 		result, err := mongo.CollectionNames(_app)
