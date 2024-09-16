@@ -45,6 +45,19 @@ func Format(res *simplejson.Json) bson.M {
 				default:
 					data[k] = v
 				}
+			} else if k == "uuid" {
+				switch val := v.(type) {
+				case json.Number:
+					strVal := val.String() // 或者使用 .Int64(), .Float64() 进行数字转换
+					objID, err := primitive.ObjectIDFromHex(strVal)
+					if err != nil {
+						data[k] = strVal
+					} else {
+						data[k] = objID
+					}
+				default:
+					data[k] = v
+				}
 			} else {
 				data[k] = v
 			}
