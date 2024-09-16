@@ -1,14 +1,14 @@
 package iJson
 
 import (
-	"reflect"
 	"encoding/json"
 	"github.com/gookit/color"
+	"reflect"
 
+	"github.com/Ireoo/API-Core/libs/debug"
 	simplejson "github.com/bitly/go-simplejson"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"github.com/Ireoo/API-Core/libs/debug"
 )
 
 func Format(res *simplejson.Json) bson.M {
@@ -25,12 +25,25 @@ func Format(res *simplejson.Json) bson.M {
 				data[k] = value
 			}
 		} else {
-			if k == "_id" && _type.Kind() == reflect.String {
-				objID, err := primitive.ObjectIDFromHex(v.(string))
-				if err != nil {
+			if k == "_id" {
+				switch val := v.(type) {
+				case string:
+					objID, err := primitive.ObjectIDFromHex(val)
+					if err != nil {
+						data[k] = val
+					} else {
+						data[k] = objID
+					}
+				case json.Number:
+					strVal := val.String() // 或者使用 .Int64(), .Float64() 进行数字转换
+					objID, err := primitive.ObjectIDFromHex(strVal)
+					if err != nil {
+						data[k] = strVal
+					} else {
+						data[k] = objID
+					}
+				default:
 					data[k] = v
-				} else {
-					data[k] = objID
 				}
 			} else {
 				data[k] = v
