@@ -49,12 +49,7 @@ func Format(res *simplejson.Json) bson.M {
 				switch val := v.(type) {
 				case json.Number:
 					strVal := val.String() // 或者使用 .Int64(), .Float64() 进行数字转换
-					objID, err := primitive.ObjectIDFromHex(strVal)
-					if err != nil {
-						data[k] = strVal
-					} else {
-						data[k] = objID
-					}
+					data[k] = strVal
 				default:
 					data[k] = v
 				}
