@@ -37,6 +37,11 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 
 	Input.Where = iJson.Format(res.Get("where"))
 	Input.Data = iJson.Format(res.Get("data"))
+
+	// 处理 json.Number 类型
+	Input.Where = convertJsonNumber(Input.Where).(primitive.M)
+	Input.Data = convertJsonNumber(Input.Data).(primitive.M)
+
 	if andArray, err := res.Get("where").Get("$and").Array(); err == nil {
 		if whereMap, ok := Input.Where.(map[string]interface{}); ok {
 			whereMap["$and"] = andArray
@@ -77,6 +82,27 @@ func parseInput(c *gin.Context) (*conf.Input, *conf.Other, error) {
 	Input.Other = other
 
 	return Input, other, nil
+}
+
+func convertJsonNumber(data interface{}) interface{} {
+	switch v := data.(type) {
+	case map[string]interface{}:
+		for key, value := range v {
+			v[key] = convertJsonNumber(value)
+		}
+	case []interface{}:
+		for i, value := range v {
+			v[i] = convertJsonNumber(value)
+		}
+	case json.Number:
+		if intVal, err := v.Int64(); err == nil {
+			return intVal
+		}
+		if floatVal, err := v.Float64(); err == nil {
+			return floatVal
+		}
+	}
+	return data
 }
 
 func handleAuth(Input *conf.Input, secret string, other *conf.Other) (string, string, error) {
